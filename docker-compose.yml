@@ -1,0 +1,35 @@
+
+services:
+  # Servicio del backend Node.js
+  backend:
+    build: ./backend # Le dice a Docker Compose dónde encontrar el Dockerfile para construir la imagen del backend
+    ports:
+      - "5000:5000" # Mapea el puerto 5000 del host al puerto 5000 del contenedor
+    volumes:
+      - ./backend:/app # Monta el código fuente local del backend en el contenedor
+                       # Esto es útil para el desarrollo, cambios en el código se reflejan sin reconstruir la imagen
+      - /app/node_modules # Evita que node_modules local sobrescriba node_modules del contenedor
+    #environment: # Variables de entorno para el servicio backend
+     # NODE_ENV: development
+     # MONGO_URI: mongodb://root:QPIOUGR12347109@mongodb:27017/recetasdb # Asegúrate de que este nombre coincida con el servicio de MongoDB
+     # JWT_SECRET: ${JWT_SECRET} # Toma JWT_SECRET de .env global o de la shell
+    depends_on: # Asegura que MongoDB se inicie antes que el backend
+      - mongodb
+    env_file: # Carga variables de entorno desde el .env del backend
+      - ./backend/.env
+
+  # Servicio de la base de datos MongoDB
+  mongodb:
+    image: mongo:latest # Usa la imagen oficial más reciente de MongoDB
+    ports:
+      - "27017:27017" # Opcional: Mapea el puerto de MongoDB al host, útil para acceder con un cliente como MongoDB Compass
+    volumes:
+      - mongodb_data:/data/db # Monta un volumen para persistir los datos de MongoDB
+                              # ¡MUY IMPORTANTE! Sin esto, tus datos se perderían cada vez que el contenedor se detenga.
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: QPIOUGR12347109
+
+# Volúmenes que se usarán para la persistencia de datos
+volumes:
+  mongodb_data:
