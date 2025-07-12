@@ -1,68 +1,49 @@
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Colores primarios */
+  --primary-color: #4CAF50; /* Verde vibrante */
+  --primary-dark: #388e3c;  /* Verde más oscuro para hover */
+  --primary-light: #66bb6a; /* Verde más claro */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Colores secundarios/acentos */
+  --accent-color: #2196F3;  /* Azul para botones de búsqueda/enlaces */
+  --accent-dark: #1976D2;   /* Azul más oscuro para hover */
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Colores neutros/texto */
+  --text-color-dark: #333;     /* Texto principal oscuro */
+  --text-color-light: #f4f7f6; /* Fondo claro/texto claro */
+  --background-color: #f4f7f6; /* Fondo general de la app */
+  --card-background: #ffffff;  /* Fondo de tarjetas y formularios */
+  --border-color: #ddd;        /* Color de bordes */
+  --placeholder-color: #999;   /* Color para texto de placeholder */
+
+  /* Colores de estado */
+  --success-bg: #d4edda;       /* Fondo para mensajes de éxito */
+  --success-text: #155724;     /* Texto para mensajes de éxito */
+  --success-border: #c3e6cb;   /* Borde para mensajes de éxito */
+  --error-color: #e74c3c;      /* Rojo para errores/cerrar sesión */
+  --error-dark: #c0392b;       /* Rojo más oscuro para hover */
+
+  /* Sombras */
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 10px rgba(0, 0, 0, 0.1);
+  --shadow-button: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  /* Espaciado */
+  --padding-base: 2rem;
+  --padding-small: 1.5rem;
+
+  --max-app-width: 1800px; /* Ancho máximo para el contenido principal en pantallas grandes */
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* Estilos generales */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color-dark);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+* {
+  box-sizing: border-box; /* Asegura que padding y border no aumenten el ancho/alto */
 }

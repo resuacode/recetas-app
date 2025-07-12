@@ -1,51 +1,50 @@
+// frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import Register from './components/Register';
 import Login from './components/Login';
-import './App.css';
+import RecipeList from './components/RecipeList'; // Importa el nuevo componente
+import './App.css'; // Asegúrate de tener este archivo para los estilos
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [showRegister, setShowRegister] = useState(false); // Para alternar entre formularios
-  
-  console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser);
+  const [showRegister, setShowRegister] = useState(false);
 
+  // console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser); // Puedes quitar este log ahora si quieres
 
   useEffect(() => {
-        console.log('useEffect se ha ejecutado.');
     const token = localStorage.getItem('token');
-    const userString = localStorage.getItem('user'); 
+    const userString = localStorage.getItem('user');
 
-    // Solo intenta parsear el usuario si 'user' no es null/undefined
     if (token && userString) {
       try {
-        const parsedUser = JSON.parse(userString); // Intenta parsear el string a objeto
-        console.log('Usuario parseado de localStorage:', parsedUser); // Ver si se parsea bien
-        setCurrentUser(parsedUser); // Establece el usuario actual
-        setIsLoggedIn(true); // Solo si el parseo es exitoso y hay token
+        const parsedUser = JSON.parse(userString);
+        // console.log('Usuario parseado de localStorage:', parsedUser); // Puedes quitar este log
+        setCurrentUser(parsedUser);
+        setIsLoggedIn(true);
       } catch (e) {
-        // En caso de que el JSON no sea válido (p.ej., si fue corrompido)
         console.error("Error al parsear el JSON del usuario desde localStorage:", e);
-        // Limpiar para evitar problemas futuros
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setCurrentUser(null);
       }
-    } else {
-      console.log('No se encontró token o usuario en localStorage.');
     }
-    // --- FIN CAMBIO ---
   }, []);
 
   const handleLoginSuccess = (token, user) => {
+    // console.log('handleLoginSuccess llamado. Usuario recibido:', user); // Puedes quitar este log
     setIsLoggedIn(true);
     setCurrentUser(user);
     setShowRegister(false);
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
   };
 
   const handleLogout = () => {
-   console.log('Cerrando sesión.');
+    console.log('Cerrando sesión.');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setIsLoggedIn(false);
@@ -54,29 +53,37 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Aplicación de Recetas</h1>
+      {/* Header siempre visible */}
+      <Header
+        isLoggedIn={isLoggedIn}
+        username={currentUser}
+        onLogout={handleLogout}
+      />
 
-      {!isLoggedIn ? (
-        <div className="auth-section">
-          {showRegister ? (
-            <>
-              <Register />
-              <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
-            </>
-          ) : (
-            <>
-              <Login onLoginSuccess={handleLoginSuccess} />
-              <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="logged-in-section">
-          <p>¡Hola, {currentUser}!</p>
-          <button onClick={handleLogout}>Cerrar Sesión</button>
-          <h2>¡Listado de Recetas Vendrá Aquí!</h2>
-        </div>
-      )}
+      {/* Contenido principal que cambia según el estado de login */}
+      <main className="app-main-content">
+        {!isLoggedIn ? (
+          <div className="auth-section">
+            {showRegister ? (
+              <>
+                <Register />
+                <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
+              </>
+            ) : (
+              <>
+                <Login onLoginSuccess={handleLoginSuccess} />
+                <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
+              </>
+            )}
+          </div>
+        ) : (
+          // Si está logueado, muestra el componente RecipeList
+          <RecipeList />
+        )}
+      </main>
+
+      {/* Footer siempre visible */}
+      <Footer />
     </div>
   );
 }
