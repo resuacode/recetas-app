@@ -331,6 +331,155 @@
   margin-top: 20px;
 }
 
+/* Estilos para RecipeDetail */
+.recipe-detail-container {
+  max-width: 800px; /* Un ancho razonable para el detalle */
+  width: 100%;
+  padding: 2.5rem;
+  background-color: var(--card-background);
+  border-radius: 15px;
+  box-shadow: var(--shadow-medium);
+  text-align: left;
+}
+
+.recipe-detail-container h2 {
+  color: var(--primary-color);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 2.2rem;
+  text-align: center;
+}
+
+.recipe-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.recipe-based-on {
+  font-style: italic;
+  color: #777;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.recipe-images {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.recipe-images h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.recipe-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.recipe-ingredients,
+.recipe-instructions {
+  margin-top: 2rem;
+}
+
+.recipe-ingredients h3,
+.recipe-instructions h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.recipe-ingredients ul,
+.recipe-instructions ol {
+  list-style-position: inside; /* Mantiene los números/viñetas dentro del padding */
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.recipe-ingredients li,
+.recipe-instructions li {
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+  color: var(--text-color-dark);
+}
+
+.recipe-ingredients li {
+  list-style-type: disc; /* Viñetas */
+}
+
+.recipe-instructions li {
+  list-style-type: decimal; /* Números */
+}
+
+.recipe-meta {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 0.5rem;
+}
+
+.back-button {
+  background-color: #6c757d; /* Un gris neutro */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+  display: inline-block; /* Para que el margin-bottom funcione */
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+.loading-message, .not-found-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+    padding: 20px;
+}
+
+.error-container {
+    text-align: center;
+}
+
+
+/* Estilos para RecipeDetail - video */
+.recipe-video {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.recipe-video h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.recipe-video-iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Mantiene la relación de aspecto de video común */
+  border-radius: 10px;
+  box-shadow: var(--shadow-medium);
+  background-color: #000; /* Fondo negro mientras carga */
+}
+
+/* Agrupa los metadatos para mejor presentación */
+.recipe-meta-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
 
 /* --- Media Queries para Responsividad --- */
 

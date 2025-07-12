@@ -1,6 +1,7 @@
 // frontend/src/components/RecipeList.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react'; // Importa useRef
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -20,6 +21,8 @@ const RecipeList = () => {
 
   // Ref para el timeout del debouncing
   const debounceTimeoutRef = useRef(null);
+
+  const navigate = useNavigate(); // Inicializa useNavigate
 
   // Función para obtener TODAS las recetas desde el backend (solo una vez al inicio)
   const fetchAllRecipes = useCallback(async () => {
@@ -124,9 +127,9 @@ const RecipeList = () => {
     setSelectedCategories(selectedCategories.filter(cat => cat !== categoryToRemove));
   };
 
+  // Manejador para la selección de receta (navegación real)
   const handleRecipeClick = (recipeId) => {
-    console.log(`Clic en la receta con ID: ${recipeId}. Aquí iría la navegación a la vista de detalle.`);
-    // TODO: Implementar navegación con React Router a /recipes/:id
+    navigate(`/recipes/${recipeId}`); // ¡Navega a la ruta de detalle!
   };
 
   if (loading) return <p>Cargando recetas...</p>;

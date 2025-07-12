@@ -1,10 +1,13 @@
 // frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importa Router, Routes, Route, Navigate
+
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Register from './components/Register';
 import Login from './components/Login';
-import RecipeList from './components/RecipeList'; // Importa el nuevo componente
+import RecipeList from './components/RecipeList';
+import RecipeDetail from './components/RecipeDetail'; 
 import './App.css'; // Asegúrate de tener este archivo para los estilos
 
 function App() {
@@ -49,42 +52,58 @@ function App() {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     setCurrentUser(null);
+    window.location.href = '/'; // Recarga la página y va a la raíz
   };
 
   return (
-    <div className="app-container">
-      {/* Header siempre visible */}
-      <Header
-        isLoggedIn={isLoggedIn}
-        username={currentUser}
-        onLogout={handleLogout}
-      />
+     <Router>
+      <div className="app-container">
+        {/* Header siempre visible */}
+        <Header
+          isLoggedIn={isLoggedIn}
+          username={currentUser}
+          onLogout={handleLogout}
+        />
 
-      {/* Contenido principal que cambia según el estado de login */}
-      <main className="app-main-content">
-        {!isLoggedIn ? (
-          <div className="auth-section">
-            {showRegister ? (
-              <>
-                <Register />
-                <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
-              </>
-            ) : (
-              <>
-                <Login onLoginSuccess={handleLoginSuccess} />
-                <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
-              </>
-            )}
-          </div>
-        ) : (
-          // Si está logueado, muestra el componente RecipeList
-          <RecipeList />
-        )}
-      </main>
+        {/* Contenido principal que cambia según el estado de login */}
+        <main className="app-main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                !isLoggedIn ? (
+                  <div className="auth-section">
+                    {showRegister ? (
+                      <>
+                        <Register />
+                        <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
+                      </>
+                    ) : (
+                      <>
+                        <Login onLoginSuccess={handleLoginSuccess} />
+                        <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <RecipeList /> // Si está logueado, muestra RecipeList
+                )
+              }
+            />
+            {/* Ruta para la vista de detalle de la receta */}
+            <Route
+              path="/recipes/:id"
+              element={isLoggedIn ? <RecipeDetail /> : <Navigate to="/" replace />}
+            />
+            {/* Opcional: Ruta por defecto para 404 o redirección */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
 
-      {/* Footer siempre visible */}
-      <Footer />
-    </div>
+        {/* Footer siempre visible */}
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
