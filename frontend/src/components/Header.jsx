@@ -1,19 +1,27 @@
 // frontend/src/components/Header.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Header = ({ isLoggedIn, username, onLogout }) => {
+const Header = ({ isLoggedIn, username, userRole, onLogout }) => {
   return (
     <header className="app-header">
       <div className="header-left">
         {/* Puedes añadir un logo o algo aquí si quieres */}
       </div>
       <div className="header-center">
-        <h1>Rescetario by dr.eats</h1>
+        <Link to="/" className="app-title-link"> {/* Enlaza el título a la raíz */}
+            <h1>Rescetario by dr.eats</h1>
+        </Link>
       </div>
       <div className="header-right">
         {isLoggedIn ? (
           <div className="user-info">
             <span>Logueado como: <strong>{username}</strong></span>
+            {userRole === 'admin' && ( // Muestra el botón solo si el rol es 'admin'
+              <Link to="/manage-recipes" className="manage-recipes-button">
+                Gestión Recetas
+              </Link>
+            )}
             <button onClick={onLogout} className="logout-button">Cerrar Sesión</button>
           </div>
         ) : (

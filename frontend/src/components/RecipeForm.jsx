@@ -1,0 +1,512 @@
+// frontend/src/components/RecipeForm.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Componente auxiliar para un campo de texto con negrita/cursiva
+const RichTextarea = ({ value, onChange, placeholder, rows = 3 }) => {
+    // Estado interno para el contenido, puede ser HTML o texto plano
+    const [internalValue, setInternalValue] = useState(value);
+
+    useEffect(() => {
+        setInternalValue(value); // Sincroniza si la prop value cambia (para edición)
+    }, [value]);
+
+    const handleInput = (e) => {
+        setInternalValue(e.target.value);
+        onChange(e.target.value); // Pasa el valor al padre
+    };
+
+    const applyFormat = (tag) => {
+        const textarea = document.getElementById(placeholder); // Obtener el textarea por ID
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = internalValue.substring(start, end);
+
+        let newText = internalValue;
+        if (selectedText) {
+            newText = internalValue.substring(0, start) +
+                      `<${tag}>${selectedText}</${tag}>` +
+                      internalValue.substring(end);
+        } else {
+            newText = internalValue + `<${tag}></${tag}>`;
+        }
+
+        setInternalValue(newText);
+        onChange(newText); // Pasa el nuevo valor al padre
+
+        // Opcional: Re-enfocar y posicionar el cursor
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + tag.length + 2, end + tag.length + 2);
+        }, 0);
+    };
+
+    return (
+        <div className="rich-textarea-container">
+            <textarea
+                id={placeholder} // Añadir ID para referencia
+                placeholder={placeholder}
+                value={internalValue}
+                onChange={handleInput}
+                rows={rows}
+            />
+            <div className="formatting-buttons">
+                <button type="button" onClick={() => applyFormat('b')}><b>B</b></button>
+                <button type="button" onClick={() => applyFormat('i')}><i>I</i></button>
+                {/* Añadir más botones de formato si se desea */}
+            </div>
+        </div>
+    );
+};
+
+
+const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData como prop
+  const navigate = useNavigate();
+  const { id } = useParams(); // Obtiene el ID si estamos en modo edición
+
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    imagesUrl: [''],
+    videoUrl: '',
+    categories: [''],
+    ingredients: [{ name: '', quantity: '', unit: '' }],
+    instructions: [{ step: '' }],
+    prepTime: '',
+    cookTime: '',
+    servings: '',
+    basedOn: '',
+  });
+  const [error, setError] = useState(null);
+  const [loadingForm, setLoadingForm] = useState(true); // Nuevo estado para la carga inicial del formulario
+  const [saving, setSaving] = useState(false); // Estado para el proceso de guardar
+
+  const fetchRecipe = useCallback(async () => {
+    setLoadingForm(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const response = await axios.get(`${API_URL}/recipes/${id}`, config);
+      const recipeData = response.data;
+
+      // Mapear los datos de la receta para el estado del formulario
+      setFormData({
+        title: recipeData.title || '',
+        description: recipeData.description || '',
+        imagesUrl: recipeData.imagesUrl?.length > 0 ? recipeData.imagesUrl : [''],
+        videoUrl: recipeData.videoUrl || '',
+        categories: recipeData.categories?.length > 0 ? recipeData.categories : [''],
+        ingredients: recipeData.ingredients?.length > 0 ? recipeData.ingredients : [{ name: '', quantity: '', unit: '' }],
+        // Asegurarse de que instructions tenga la propiedad 'step'
+        instructions: recipeData.instructions?.length > 0 ? recipeData.instructions.map(inst => ({ step: inst.step || '' })) : [{ step: '' }],
+        prepTime: recipeData.prepTime || '',
+        cookTime: recipeData.cookTime || '',
+        servings: recipeData.servings || '',
+        basedOn: recipeData.basedOn || '',
+      });
+    } catch (err) {
+      console.error('Error al cargar la receta para editar:', err);
+      setError('No se pudo cargar la receta para editar. Asegúrate de que existe o inténtalo más tarde.');
+      // Si hay un error, redirigir a la página de gestión
+      navigate('/manage-recipes');
+    } finally {
+      setLoadingForm(false);
+    }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (type === 'edit' && id) {
+      fetchRecipe();
+    } else {
+      // Si es 'create', reinicia el formulario
+      setFormData({
+        title: '',
+        description: '',
+        imagesUrl: [''],
+        videoUrl: '',
+        categories: [''],
+        ingredients: [{ name: '', quantity: '', unit: '' }],
+        instructions: [{ step: '' }],
+        prepTime: '',
+        cookTime: '',
+        servings: '',
+        basedOn: '',
+      });
+      setLoadingForm(false); // No necesitamos cargar si es creación
+    }
+  }, [type, id, fetchRecipe]); // Dependencias para re-ejecutar el efecto
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // --- Manejo de Arrays Dinámicos ---
+
+  // Imágenes
+  const handleImageChange = (index, value) => {
+    const newImages = [...formData.imagesUrl];
+    newImages[index] = value;
+    setFormData({ ...formData, imagesUrl: newImages });
+  };
+  const addImageField = () => setFormData({ ...formData, imagesUrl: [...formData.imagesUrl, ''] });
+  const removeImageField = (index) => {
+    const newImages = formData.imagesUrl.filter((_, i) => i !== index);
+    setFormData({ ...formData, imagesUrl: newImages.length > 0 ? newImages : [''] }); // Asegura al menos un campo
+  };
+
+  // Categorías
+  const handleCategoryChange = (index, value) => {
+    const newCategories = [...formData.categories];
+    newCategories[index] = value;
+    setFormData({ ...formData, categories: newCategories });
+  };
+  const addCategoryField = () => setFormData({ ...formData, categories: [...formData.categories, ''] });
+  const removeCategoryField = (index) => {
+    const newCategories = formData.categories.filter((_, i) => i !== index);
+    setFormData({ ...formData, categories: newCategories.length > 0 ? newCategories : [''] }); // Asegura al menos un campo
+  };
+
+  // Ingredientes
+  const handleIngredientChange = (index, field, value) => {
+    const newIngredients = [...formData.ingredients];
+    newIngredients[index] = { ...newIngredients[index], [field]: value };
+    setFormData({ ...formData, ingredients: newIngredients });
+  };
+  const addIngredientField = () => setFormData({ ...formData, ingredients: [...formData.ingredients, { name: '', quantity: '', unit: '' }] });
+  const removeIngredientField = (index) => {
+    const newIngredients = formData.ingredients.filter((_, i) => i !== index);
+    setFormData({ ...formData, ingredients: newIngredients.length > 0 ? newIngredients : [{ name: '', quantity: '', unit: '' }] });
+  };
+
+  // Instrucciones (Pasos)
+  const handleInstructionChange = (index, value) => {
+    const newInstructions = [...formData.instructions];
+    newInstructions[index] = { step: value };
+    setFormData({ ...formData, instructions: newInstructions });
+  };
+  const addInstructionField = () => setFormData({ ...formData, instructions: [...formData.instructions, { step: '' }] });
+  const removeInstructionField = (index) => {
+    const newInstructions = formData.instructions.filter((_, i) => i !== index);
+    setFormData({ ...formData, instructions: newInstructions.length > 0 ? newInstructions : [{ step: '' }] });
+  };
+
+  // --- Envío del Formulario ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSaving(true); 
+
+    // Validaciones en el frontend (básicas)
+    if (!formData.title.trim() || !formData.description.trim()) {
+        setError('El título y la descripción son obligatorios.');
+        setSaving(false);
+        return;
+    }
+    if (formData.categories.filter(cat => cat.trim()).length === 0) {
+        setError('Debes añadir al menos una categoría.');
+        setSaving(false);
+        return;
+    }
+    if (formData.ingredients.filter(ing => ing.name.trim() && ing.quantity && ing.unit.trim()).length === 0) {
+        setError('Debes añadir al menos un ingrediente completo.');
+        setSaving(false);
+        return;
+    }
+    if (formData.instructions.filter(inst => inst.step.trim()).length === 0) {
+        setError('Debes añadir al menos un paso de instrucción.');
+        setSaving(false);
+        return;
+    }
+
+    // Limpiar datos antes de enviar al backend
+    const dataToSend = {
+      ...formData,
+      // Filtrar enlaces de imágenes y categorías vacíos
+      imagesUrl: formData.imagesUrl.filter(url => url.trim() !== ''),
+      categories: formData.categories.filter(cat => cat.trim() !== ''),
+      // Filtrar ingredientes y pasos vacíos
+      ingredients: formData.ingredients.filter(ing => ing.name.trim() && ing.quantity && ing.unit.trim()),
+      instructions: formData.instructions.filter(inst => inst.step.trim()).map((inst, index) => ({
+        step: inst.step,
+        order: index + 1 // Asignar el orden automáticamente
+      })),
+      // Convertir números a null si están vacíos o no son válidos
+      prepTime: formData.prepTime === '' ? null : parseInt(formData.prepTime, 10),
+      cookTime: formData.cookTime === '' ? null : parseInt(formData.cookTime, 10),
+      servings: formData.servings === '' ? null : parseInt(formData.servings, 10),
+      // Convertir basedOn y videoUrl a null si están vacíos
+      basedOn: formData.basedOn.trim() === '' ? null : formData.basedOn.trim(),
+      videoUrl: formData.videoUrl.trim() === '' ? null : formData.videoUrl.trim(),
+    };
+
+    // Eliminar propiedades con valor null si el backend prefiere que no existan
+    for (const key in dataToSend) {
+        if (dataToSend[key] === null || (Array.isArray(dataToSend[key]) && dataToSend[key].length === 0)) {
+            delete dataToSend[key];
+        }
+    }
+
+    // Ajuste para el videoUrl - Si es TikTok/Instagram, es posible que necesitemos el embed
+    if (dataToSend.videoUrl) {
+        // Ejemplo básico, podrías necesitar una lógica más compleja
+        if (dataToSend.videoUrl.includes('tiktok.com') && !dataToSend.videoUrl.includes('/embed/')) {
+            // Heurística simple, mejora según la API de TikTok
+            // Podrías necesitar un backend para obtener el embed o usar una API
+            // For now, let's just use the direct URL, it might not embed
+        }
+        if (dataToSend.videoUrl.includes('instagram.com') && !dataToSend.videoUrl.includes('/embed/')) {
+            // Igual que con TikTok
+        }
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      let response;
+      if (type === 'create') {
+        response = await axios.post(`${API_URL}/recipes`, dataToSend, config);
+        alert('Receta creada exitosamente!');
+      } else { // 'edit'
+        response = await axios.put(`${API_URL}/recipes/${id}`, dataToSend, config);
+        alert('Receta actualizada exitosamente!');
+      }
+      // console.log('Respuesta del servidor:', response.data);
+      navigate('/manage-recipes'); // Redirigir a la gestión de recetas
+    } catch (err) {
+      console.error('Error al guardar la receta:', err.response?.data?.message || err.message);
+      setError(err.response?.data?.message || 'Error al guardar la receta. Inténtalo de nuevo.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+    // Muestra un mensaje de carga inicial si estamos en modo edición
+  if (loadingForm && type === 'edit') return <p className="loading-message">Cargando receta para editar...</p>;
+
+  // Muestra un mensaje de error si la carga inicial falló
+  if (error && type === 'edit') return (
+    <div className="error-container">
+      <p className="error-message">{error}</p>
+      <button onClick={() => navigate('/manage-recipes')} className="back-button">Volver a la gestión de recetas</button>
+    </div>
+    );
+
+  return (
+    <div className="recipe-form-container">
+      <h2>{type === 'create' ? 'Crear Nueva Receta' : 'Editar Receta'}</h2>
+      {error && <p className="error-message">{error}</p>} {/* Muestra errores de envío */}
+      <form onSubmit={handleSubmit}>
+        {/* Título */}
+        <div className="form-group">
+          <label htmlFor="title">Título de la Receta *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Ej: Tortilla de Patatas Tradicional"
+            required
+          />
+        </div>
+
+        {/* Descripción */}
+        <div className="form-group">
+          <label htmlFor="description">Descripción Breve *</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Ej: Una deliciosa y jugosa tortilla al estilo español..."
+            rows="3"
+            required
+          />
+        </div>
+
+        {/* Imágenes URL */}
+        <div className="form-group dynamic-fields-group">
+          <label>Imágenes (URLs)</label>
+          {formData.imagesUrl.map((url, index) => (
+            <div key={index} className="dynamic-field-item">
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => handleImageChange(index, e.target.value)}
+                placeholder={`URL de imagen ${index + 1}`}
+              />
+              {formData.imagesUrl.length > 1 && (
+                <button type="button" onClick={() => removeImageField(index)} className="remove-field-button">X</button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={addImageField} className="add-field-button">Añadir más imágenes</button>
+        </div>
+
+        {/* Video URL */}
+        <div className="form-group">
+          <label htmlFor="videoUrl">Enlace de Vídeo (TikTok/Instagram)</label>
+          <input
+            type="url"
+            id="videoUrl"
+            name="videoUrl"
+            value={formData.videoUrl}
+            onChange={handleChange}
+            placeholder="Ej: https://www.tiktok.com/@user/video/..."
+          />
+        </div>
+
+        {/* Categorías */}
+        <div className="form-group dynamic-fields-group">
+          <label>Categorías *</label>
+          {formData.categories.map((cat, index) => (
+            <div key={index} className="dynamic-field-item">
+              <input
+                type="text"
+                value={cat}
+                onChange={(e) => handleCategoryChange(index, e.target.value)}
+                placeholder={`Categoría ${index + 1}`}
+              />
+              {formData.categories.length > 1 && ( // Permite eliminar si hay más de una
+                <button type="button" onClick={() => removeCategoryField(index)} className="remove-field-button">X</button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={addCategoryField} className="add-field-button">Añadir más categorías</button>
+        </div>
+
+        {/* Ingredientes */}
+        <div className="form-group dynamic-fields-group">
+          <label>Ingredientes *</label>
+          {formData.ingredients.map((ing, index) => (
+            <div key={index} className="dynamic-field-item ingredient-item">
+              <input
+                type="text"
+                value={ing.name}
+                onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                placeholder="Nombre (Ej: Patatas)"
+                required={index === 0} // Primer ingrediente obligatorio
+              />
+              <input
+                type="number"
+                value={ing.quantity}
+                onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                placeholder="Cantidad (Ej: 500)"
+                required={index === 0}
+                min="0"
+              />
+              <input
+                type="text"
+                value={ing.unit}
+                onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
+                placeholder="Unidad (Ej: gramos)"
+                required={index === 0}
+              />
+              {formData.ingredients.length > 1 && (
+                <button type="button" onClick={() => removeIngredientField(index)} className="remove-field-button">X</button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={addIngredientField} className="add-field-button">Añadir más ingredientes</button>
+        </div>
+
+        {/* Instrucciones (Pasos) */}
+        <div className="form-group dynamic-fields-group">
+          <label>Instrucciones (Paso a Paso) *</label>
+          {formData.instructions.map((inst, index) => (
+            <div key={index} className="dynamic-field-item instruction-item">
+              <span className="step-number">{index + 1}.</span>
+              <RichTextarea
+                value={inst.step}
+                onChange={(value) => handleInstructionChange(index, value)}
+                placeholder={`Paso ${index + 1}`}
+                rows={3}
+              />
+              {formData.instructions.length > 1 && (
+                <button type="button" onClick={() => removeInstructionField(index)} className="remove-field-button">X</button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={addInstructionField} className="add-field-button">Añadir más pasos</button>
+        </div>
+
+        {/* Campos Numéricos y BasedOn */}
+        <div className="form-group optional-fields-group">
+            <h3>Detalles Opcionales</h3>
+            <div className="optional-fields-grid">
+                <div className="form-group-inline">
+                    <label htmlFor="prepTime">Tiempo de Preparación (minutos)</label>
+                    <input
+                        type="number"
+                        id="prepTime"
+                        name="prepTime"
+                        value={formData.prepTime}
+                        onChange={handleChange}
+                        placeholder="Ej: 30"
+                        min="0"
+                    />
+                </div>
+                <div className="form-group-inline">
+                    <label htmlFor="cookTime">Tiempo de Cocción (minutos)</label>
+                    <input
+                        type="number"
+                        id="cookTime"
+                        name="cookTime"
+                        value={formData.cookTime}
+                        onChange={handleChange}
+                        placeholder="Ej: 20"
+                        min="0"
+                    />
+                </div>
+                <div className="form-group-inline">
+                    <label htmlFor="servings">Número de Raciones</label>
+                    <input
+                        type="number"
+                        id="servings"
+                        name="servings"
+                        value={formData.servings}
+                        onChange={handleChange}
+                        placeholder="Ej: 4"
+                        min="1"
+                    />
+                </div>
+            </div>
+            <div className="form-group">
+                <label htmlFor="basedOn">Basado en</label>
+                <input
+                    type="text"
+                    id="basedOn"
+                    name="basedOn"
+                    value={formData.basedOn}
+                    onChange={handleChange}
+                    placeholder="Ej: Receta de @Diegodoal"
+                />
+            </div>
+        </div>
+
+        <button type="submit" className="submit-recipe-button" disabled={saving}>
+          {saving ? 'Guardando...' : (type === 'create' ? 'Crear Receta' : 'Actualizar Receta')}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default RecipeForm;

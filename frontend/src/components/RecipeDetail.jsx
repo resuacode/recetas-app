@@ -114,16 +114,16 @@ const RecipeDetail = () => {
       )}
 
       {/* Paso a Paso */}
-      {recipe.instructions && recipe.instructions.length > 0 && (
+     {isPresent(recipe.instructions) && (
         <div className="recipe-instructions">
-            <h3>Preparación:</h3>
-            <ol>
-            {recipe.instructions.map((step, index) => (
-                <li key={index}>{step.step}</li>
+        <h3>Preparación:</h3>
+        <ol>
+            {recipe.instructions.map((inst, index) => ( // Cambiado a 'inst' para mayor claridad
+            <li key={index} dangerouslySetInnerHTML={{ __html: inst.step }}></li> 
             ))}
-            </ol>
+        </ol>
         </div>
-        )}
+    )}
 
         <div className="recipe-meta-section">
         <p className="recipe-meta">Categorías: {recipe.categories?.join(', ') || 'N/A'}</p>

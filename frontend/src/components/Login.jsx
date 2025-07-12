@@ -26,10 +26,11 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
       // o una librería de autenticación. Por ahora, lo guardamos en localStorage.
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.username)); // Guarda el usuario también
+      localStorage.setItem('role', response.data.role); // Guarda el rol del usuario
       
       // Llama a la función que se pase desde el padre para indicar que el login fue exitoso
       if (onLoginSuccess) {
-        onLoginSuccess(response.data.token, response.data.username);
+        onLoginSuccess(response.data.token, response.data.username, response.data.role);
       }
 
       // Opcional: limpiar el formulario
