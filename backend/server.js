@@ -10,22 +10,30 @@ const recipeRoutes = require('./routes/recipeRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
-
-// --- AÑADE ESTAS LÍNEAS TEMPORALMENTE ---
-console.log('Variables de entorno cargadas:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('MONGO_URI:', process.env.MONGO_URI);
-console.log('JWT_SECRET (primeros 5 caracteres):', process.env.JWT_SECRET ? process.env.JWT_SECRET.substring(0, 5) + '...' : 'No definido');
-// --- FIN DE LAS LÍNEAS TEMPORALES ---
-
-
-
 connectDB();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+
+// Configuración de CORS
+const allowedOrigins = [
+    'http://localhost:5173', // Para desarrollo local
+    process.env.FRONTEND_URL // <-- Variable de entorno para producción
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Permitir solicitudes sin origen (como de herramientas como Postman o curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true // Si manejas cookies o headers de autorización
+}));
 
 app.get('/', (req, res) => {
   res.send('API de Recetas funcionando!');

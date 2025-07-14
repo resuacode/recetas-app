@@ -38,6 +38,23 @@ const recipeSchema = mongoose.Schema(
             default: '', // Puede ser opcional, con un valor por defecto
         }
     ],
+     videoUrl: { // Nuevo campo para el URL del video
+      type: String,
+      trim: true,
+      default: null, // Opcional: establecer un valor por defecto explícito de null
+    },
+    prepTime: { // Nuevo campo para tiempo de preparación
+      type: Number, // En minutos, por ejemplo
+      default: null,
+    },
+    cookTime: { // Nuevo campo para tiempo de cocción
+      type: Number, // En minutos, por ejemplo
+      default: null,
+    },
+    servings: { // Nuevo campo para número de raciones
+      type: Number,
+      default: null,
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId, // Referencia al ID del usuario que creó la receta
       ref: 'User', // Referencia al modelo 'User'
@@ -46,10 +63,6 @@ const recipeSchema = mongoose.Schema(
     basedOn: {
       type: String,
       default: '', // Valor por defecto para que no sea estrictamente requerido
-    },
-    approximateTime: {
-      type: Number, // Duración en minutos
-      default: 0, // O un valor que consideres apropiado si no se especifica
     },
   },
   {

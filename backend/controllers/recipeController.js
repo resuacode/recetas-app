@@ -52,7 +52,7 @@ const getRecipeById = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const createRecipe = asyncHandler(async (req, res) => {
   // req.user viene del middleware 'protect' y contiene el usuario autenticado
-  const { title, description, instructions, ingredients, categories, imagesUrl, basedOn, approximateTime } = req.body;
+  const { title, description, instructions, ingredients, categories, imagesUrl, videoUrl, prepTime, cookTime, servings, basedOn } = req.body;
 
   if (!title || !description || !instructions || !ingredients || !categories) {
     res.status(400);
@@ -77,9 +77,12 @@ const createRecipe = asyncHandler(async (req, res) => {
     ingredients,
     categories,
     imagesUrl: imagesUrl || [], // Si no se proveen imágenes, un array vacío
+    videoUrl: videoUrl || null, // Si no se provee, será null
+    prepTime: prepTime || null, // Si no se provee, será null
+    cookTime: cookTime || null, // Si no se provee, será null
+    servings: servings || null, // Si no se provee, será null
     author: req.user._id, // Asigna el ID del usuario autenticado como autor
     basedOn: basedOn || '', // Si no se provee, usará el default del esquema o un string vacío
-    approximateTime: approximateTime || 0, // Si no se provee, usará el default del esquema o 0
   });
 
   const createdRecipe = await recipe.save();
@@ -90,7 +93,7 @@ const createRecipe = asyncHandler(async (req, res) => {
 // @route   PUT /api/recipes/:id
 // @access  Private/Admin
 const updateRecipe = asyncHandler(async (req, res) => {
-  const { title, description, instructions, ingredients, categories, imagesUrl, basedOn, approximateTime } = req.body;
+  const { title, description, instructions, ingredients, categories, imagesUrl, videoUrl, prepTime,cookTime, servings, basedOn } = req.body;
 
   const recipe = await Recipe.findById(req.params.id);
 
@@ -105,8 +108,11 @@ const updateRecipe = asyncHandler(async (req, res) => {
     recipe.ingredients = ingredients || recipe.ingredients;
     recipe.categories = categories || recipe.categories;
     recipe.imagesUrl = imagesUrl || recipe.imagesUrl;
+    recipe.videoUrl = videoUrl !== undefined ? videoUrl : recipe.videoUrl; // Si no se provee, mantén el existente
+    recipe.prepTime = prepTime !== undefined ? prepTime : recipe.prepTime;
+    recipe.cookTime = cookTime !== undefined ? cookTime : recipe.cookTime;
+    recipe.servings = servings !== undefined ? servings : recipe.servings;
     recipe.basedOn = basedOn !== undefined ? basedOn : recipe.basedOn;
-    recipe.approximateTime = approximateTime !== undefined ? approximateTime : recipe.approximateTime;
 
 
     const updatedRecipe = await recipe.save();
