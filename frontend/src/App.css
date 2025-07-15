@@ -856,6 +856,21 @@
   box-shadow: none;
 }
 
+/* Estilo para los mensajes de error debajo de los inputs */
+.error-input-message {
+    color: #dc3545; /* Rojo */
+    font-size: 0.85rem;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+/* Opcional: Resaltar los inputs con error */
+.form-group input.error,
+.form-group textarea.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
 
 
 /* --- Media Queries para Responsividad --- */
@@ -928,6 +943,61 @@
     flex-direction: column; /* Apila los filtros en columnas en móviles */
     align-items: stretch;
   }
+
+  /* Estilos para el contenedor de paginación */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Espacio entre el selector y los botones */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Para que se ajusten en pantallas pequeñas */
+}
+
+.pagination-controls.bottom {
+    margin-top: 40px; /* Más espacio si está al final */
+}
+
+.recipes-per-page-group,
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.pagination-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.pagination-buttons span {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Ajustes para el select */
+.pagination-controls select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}
 
   .search-bar-group input,
   .category-input-group input,

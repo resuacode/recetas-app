@@ -1,5 +1,5 @@
 // frontend/src/components/RecipeList.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react'; // Importa useRef
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
@@ -7,8 +7,8 @@ import RecipeCard from './RecipeCard';
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const RecipeList = () => {
-  const [allRecipes, setAllRecipes] = useState([]); // Almacena todas las recetas
-  const [filteredRecipes, setFilteredRecipes] = useState([]); // Las recetas que se muestran
+  const [allRecipes, setAllRecipes] = useState([]); // Almacena todas las recetas del backend
+  const [displayedRecipes, setDisplayedRecipes] = useState([]); // Las recetas que se muestran en la página actual (después de filtros, orden y paginación)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,12 +17,17 @@ const RecipeList = () => {
   const [categoriesInput, setCategoriesInput] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [authorFilter, setAuthorFilter] = useState('');
-  const [sortOrder, setSortOrder] = useState('createdAt:desc'); // 'createdAt:desc' (más recientes), 'createdAt:asc' (más antiguas)
+  const [sortOrder, setSortOrder] = useState('createdAt:desc');
 
-  // Ref para el timeout del debouncing
+  // Ref para el timeout del debouncing (no se usará para el filtrado local, pero lo dejamos)
   const debounceTimeoutRef = useRef(null);
 
-  const navigate = useNavigate(); // Inicializa useNavigate
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recipesPerPage, setRecipesPerPage] = useState(10); // Opciones: 10, 20, 50
+  const [totalFilteredCount, setTotalFilteredCount] = useState(0); // Total de recetas después de FILTROS y ORDENACIÓN (antes de paginación)
+
+  const navigate = useNavigate();
 
   // Función para obtener TODAS las recetas desde el backend (solo una vez al inicio)
   const fetchAllRecipes = useCallback(async () => {
@@ -35,25 +40,23 @@ const RecipeList = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-      // No se envían parámetros de filtro aquí para obtener todas las recetas
       const response = await axios.get(`${API_URL}/recipes`, config);
       setAllRecipes(response.data); // Guarda todas las recetas
-      setFilteredRecipes(response.data); // Inicialmente, las filtradas son todas
+      // No inicializamos displayedRecipes aquí, el useEffect de filtrado/paginación se encargará
     } catch (err) {
       console.error('Error al cargar todas las recetas:', err);
       setError('No se pudieron cargar las recetas. Inténtalo de nuevo más tarde.');
     } finally {
       setLoading(false);
     }
-  }, []); // Dependencias vacías: solo se ejecuta una vez al montar
+  }, []);
 
   // useEffect para llamar a fetchAllRecipes al montar el componente
   useEffect(() => {
     fetchAllRecipes();
   }, [fetchAllRecipes]);
 
-  // Función para aplicar filtros y ordenación en el frontend
-  // Se ejecuta cada vez que cambian los estados de filtro/orden
+  // Función para aplicar filtros, ordenación Y paginación en el frontend
   useEffect(() => {
     let currentRecipes = [...allRecipes]; // Trabaja con una copia de todas las recetas
 
@@ -93,21 +96,49 @@ const RecipeList = () => {
       }
     });
 
-    setFilteredRecipes(currentRecipes);
-  }, [searchTerm, selectedCategories, authorFilter, sortOrder, allRecipes]);
+    // Guardar el total de recetas después de filtros y ordenación, antes de la paginación
+    setTotalFilteredCount(currentRecipes.length);
+
+    // 5. Aplicar Paginación
+    const indexOfLastRecipe = currentPage * recipesPerPage;
+    const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
+
+    const recipesForCurrentPage = currentRecipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
+    setDisplayedRecipes(recipesForCurrentPage); // Actualiza las recetas que se mostrarán
+
+    // Asegurarse de que la página actual no sea inválida si los filtros reducen el número total de recetas
+    const calculatedTotalPages = Math.ceil(currentRecipes.length / recipesPerPage);
+    if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(calculatedTotalPages); // Si la página actual es mayor que el número total de páginas, ir a la última
+    } else if (calculatedTotalPages === 0 && currentPage !== 1) {
+      setCurrentPage(1); // Si no hay recetas con los filtros y no estamos en la página 1, ir a la página 1
+    }
+
+  }, [searchTerm, selectedCategories, authorFilter, sortOrder, allRecipes, currentPage, recipesPerPage]);
 
 
-  // Manejadores para los filtros
+  // Calcular el número total de páginas (basado en totalFilteredCount)
+  // Este cálculo se puede hacer aquí, ya que `totalFilteredCount` se actualiza en el `useEffect`
+  const totalPages = Math.ceil(totalFilteredCount / recipesPerPage);
+
+
+  // Manejadores para la paginación
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const handleRecipesPerPageChange = (e) => {
+    setRecipesPerPage(parseInt(e.target.value, 10));
+    setCurrentPage(1); // Resetear a la primera página cuando cambia el número de recetas por página
+  };
+
+
+  // Manejadores para los filtros (sin cambios)
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    setSearchTerm(value); // Actualiza el estado inmediatamente
-
-    // Limpia el timeout anterior si existe
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-    // No necesitamos debouncing si el filtrado es local, ¡este cambio no es necesario aquí!
-    // Lo dejé para referencia si en el futuro decides volver a llamar a la API
+    setSearchTerm(value);
   };
 
   const handleAuthorFilterChange = (e) => setAuthorFilter(e.target.value);
@@ -119,7 +150,7 @@ const RecipeList = () => {
       if (!selectedCategories.includes(newCategory)) {
         setSelectedCategories([...selectedCategories, newCategory]);
       }
-      setCategoriesInput(''); // Limpiar el input después de añadir
+      setCategoriesInput('');
     }
   };
 
@@ -129,7 +160,7 @@ const RecipeList = () => {
 
   // Manejador para la selección de receta (navegación real)
   const handleRecipeClick = (recipeId) => {
-    navigate(`/recipes/${recipeId}`); // ¡Navega a la ruta de detalle!
+    navigate(`/recipes/${recipeId}`);
   };
 
   if (loading) return <p>Cargando recetas...</p>;
@@ -171,8 +202,8 @@ const RecipeList = () => {
             ))}
           </div>
         )}
-        
-        <div className="author-filter-group"> {/* Nuevo grupo para el filtro de autor */}
+
+        <div className="author-filter-group">
           <label htmlFor="filter-author">Filtrar por autor:</label>
           <input
             id="filter-author"
@@ -190,17 +221,72 @@ const RecipeList = () => {
             <option value="createdAt:asc">Más antiguas</option>
           </select>
         </div>
+
+        {/* --- CONTROLES DE PAGINACIÓN Y POR PÁGINA --- */}
+        <div className="pagination-controls">
+          <div className="recipes-per-page-group">
+            <label htmlFor="recipesPerPage">Recetas por página:</label>
+            <select id="recipesPerPage" value={recipesPerPage} onChange={handleRecipesPerPageChange}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          <div className="pagination-buttons">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="pagination-button"
+            >
+              Anterior
+            </button>
+            <span>Página {currentPage} de {totalPages || 1}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="pagination-button"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="recipes-grid">
-        {filteredRecipes.length === 0 ? (
+        {displayedRecipes.length === 0 && totalFilteredCount > 0 ? (
+          <p>No se encontraron recetas en esta página con los filtros aplicados.</p>
+        ) : displayedRecipes.length === 0 && totalFilteredCount === 0 ? (
           <p>No se encontraron recetas con los filtros aplicados.</p>
         ) : (
-          filteredRecipes.map((recipe) => (
+          displayedRecipes.map((recipe) => (
             <RecipeCard key={recipe._id} recipe={recipe} onClick={handleRecipeClick} />
           ))
         )}
       </div>
+
+      {/* Repetir los controles de paginación al final para mejor UX */}
+      {totalPages > 1 && (
+        <div className="pagination-controls bottom">
+          <div className="pagination-buttons">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="pagination-button"
+            >
+              Anterior
+            </button>
+            <span>Página {currentPage} de {totalPages}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="pagination-button"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

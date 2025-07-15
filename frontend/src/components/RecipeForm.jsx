@@ -83,7 +83,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
     servings: '',
     basedOn: '',
   });
-  const [error, setError] = useState(null);
+
+  const [formErrors, setFormErrors] = useState({});
+  const [error, setError] = useState(null); // Quizás estaría bien renombrarlo a globalError o algo así
   const [loadingForm, setLoadingForm] = useState(true); // Nuevo estado para la carga inicial del formulario
   const [saving, setSaving] = useState(false); // Estado para el proceso de guardar
 
@@ -206,27 +208,85 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
   // --- Envío del Formulario ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError(null); // Limpiar errores previos globales
+    setFormErrors({}); // Limpiar errores previos
     setSaving(true); 
+
+    const newErrors = {}; // Objeto para acumular los errores
 
     // Validaciones en el frontend (básicas)
     if (!formData.title.trim() || !formData.description.trim()) {
-        toast.error('El título y la descripción son obligatorios.');
-        setSaving(false);
-        return;
+        newErrors.title = 'El título y la descripción son obligatorios.';
     }
-    if (formData.categories.filter(cat => cat.trim()).length === 0) {
-        toast.error('Debes añadir al menos una categoría.');
-        setSaving(false);
-        return;
+    
+    if (!formData.description.trim()) {
+            newErrors.description = 'La descripción es obligatoria.';
+        }
+
+    // Validar al menos una categoría válida
+    const validCategories = formData.categories.filter(cat => cat.trim() !== '');
+    if (validCategories.length === 0) {
+        newErrors.categories = 'Debes añadir al menos una categoría válida.';
     }
-    if (formData.ingredients.filter(ing => ing.name.trim() && ing.quantity && ing.unit.trim()).length === 0) {
-        toast.error('Debes añadir al menos un ingrediente completo.');
-        setSaving(false);
-        return;
+
+    // Validar al menos un ingrediente completo y válido
+    const validIngredients = formData.ingredients.filter(ing =>
+        ing.name.trim() && ing.quantity > 0 && ing.unit.trim()
+    );
+    if (validIngredients.length === 0) {
+        newErrors.ingredients = 'Debes añadir al menos un ingrediente con nombre, cantidad (mayor que 0) y unidad.';
+    } else {
+        // Validar que si hay ingredientes, sus campos numéricos sean válidos
+        formData.ingredients.forEach((ing, index) => {
+            if (ing.name.trim() || ing.quantity || ing.unit.trim()) { // Si el ingrediente no está totalmente vacío
+                if (!ing.name.trim()) newErrors[`ingredientName-${index}`] = 'El nombre del ingrediente es obligatorio.';
+                if (ing.quantity === '' || isNaN(ing.quantity) || ing.quantity <= 0) newErrors[`ingredientQuantity-${index}`] = 'La cantidad debe ser un número positivo.';
+                if (!ing.unit.trim()) newErrors[`ingredientUnit-${index}`] = 'La unidad es obligatoria.';
+            }
+        });
     }
-    if (formData.instructions.filter(inst => inst.step.trim()).length === 0) {
-        toast.error('Debes añadir al menos un paso de instrucción.');
+
+
+    // Validar al menos un paso de instrucción válido
+    const validInstructions = formData.instructions.filter(inst => inst.step.trim() !== '');
+    if (validInstructions.length === 0) {
+        newErrors.instructions = 'Debes añadir al menos un paso de instrucción válido.';
+    } else {
+        // Validar que si hay instrucciones, no estén vacías
+        formData.instructions.forEach((inst, index) => {
+            if (!inst.step.trim()) {
+                newErrors[`instructionStep-${index}`] = `El paso ${index + 1} no puede estar vacío.`;
+            }
+        });
+    }
+
+    // Validaciones para tiempos y raciones (números positivos opcionales)
+    if (formData.prepTime !== '' && (isNaN(formData.prepTime) || parseInt(formData.prepTime, 10) < 0)) {
+        newErrors.prepTime = 'El tiempo de preparación debe ser un número positivo.';
+    }
+    if (formData.cookTime !== '' && (isNaN(formData.cookTime) || parseInt(formData.cookTime, 10) < 0)) {
+        newErrors.cookTime = 'El tiempo de cocción debe ser un número positivo.';
+    }
+    if (formData.servings !== '' && (isNaN(formData.servings) || parseInt(formData.servings, 10) < 1)) {
+        newErrors.servings = 'El número de raciones debe ser un número positivo (al menos 1).';
+    }
+
+    // Validar formato URL (para imagesUrl y videoUrl)
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/; 
+
+    formData.imagesUrl.forEach((url, index) => {
+        if (url.trim() !== '' && !urlRegex.test(url)) {
+            newErrors[`imageUrl-${index}`] = `La URL de la imagen ${index + 1} no es válida.`;
+        }
+    });
+    if (formData.videoUrl.trim() !== '' && !urlRegex.test(formData.videoUrl.trim())) {
+        newErrors.videoUrl = 'La URL del video no es válida.';
+    }
+
+    // Si hay errores, actualiza el estado de errores y detiene el envío
+    if (Object.keys(newErrors).length > 0) {
+        setFormErrors(newErrors);
+        toast.error('Por favor, corrige los errores en el formulario.'); // Un toast general de advertencia
         setSaving(false);
         return;
     }
@@ -314,6 +374,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
     <div className="recipe-form-container">
       <h2>{type === 'create' ? 'Crear Nueva Receta' : 'Editar Receta'}</h2>
       {error && <p className="error-message">{error}</p>} {/* Muestra errores de envío */}
+      {formErrors.general && <p className="error-message">{formErrors.general}</p>} {/* Si quieres un error general al inicio */}
+
+
       <form onSubmit={handleSubmit}>
         {/* Título */}
         <div className="form-group">
@@ -324,9 +387,11 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
             name="title"
             value={formData.title}
             onChange={handleChange}
-            placeholder="Ej: Tortilla de Patatas Tradicional"
-            required
+            placeholder="Ej: Tortilla de Patatas"
+            className={formErrors.title ? 'error' : ''} 
+            // required // lo manejamos con validación personalizada
           />
+          {formErrors.title && <p className="error-input-message">{formErrors.title}</p>}
         </div>
 
         {/* Descripción */}
@@ -337,10 +402,12 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
             name="description"
             value={formData.description}
             onChange={handleChange}
-            placeholder="Ej: Una deliciosa y jugosa tortilla al estilo español..."
+            placeholder="Ej: Una deliciosa y jugosa tortilla..."
             rows="3"
-            required
+            className={formErrors.description ? 'error' : ''}
+            // required // lo manejamos con validación personalizada
           />
+          {formErrors.description && <p className="error-input-message">{formErrors.description}</p>}
         </div>
 
         {/* Imágenes URL */}
@@ -352,14 +419,19 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 type="url"
                 value={url}
                 onChange={(e) => handleImageChange(index, e.target.value)}
+                className={formErrors[`imageUrl-${index}`] ? 'error' : ''}
                 placeholder={`URL de imagen ${index + 1}`}
               />
               {formData.imagesUrl.length > 1 && (
                 <button type="button" onClick={() => removeImageField(index)} className="remove-field-button">X</button>
               )}
+             {formErrors[`imageUrl-${index}`] && <p className="error-input-message">{formErrors[`imageUrl-${index}`]}</p>} 
+
             </div>
           ))}
           <button type="button" onClick={addImageField} className="add-field-button">Añadir más imágenes</button>
+          {formErrors.imagesUrl && <p className="error-input-message">{formErrors.imagesUrl}</p>} {/* Error general para el grupo */}
+
         </div>
 
         {/* Video URL */}
@@ -371,8 +443,10 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
             name="videoUrl"
             value={formData.videoUrl}
             onChange={handleChange}
+            className={formErrors.videoUrl ? 'error' : ''}
             placeholder="Ej: https://www.tiktok.com/@user/video/..."
           />
+        {formErrors.videoUrl && <p className="error-input-message">{formErrors.videoUrl}</p>} 
         </div>
 
         {/* Categorías */}
@@ -385,6 +459,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 value={cat}
                 onChange={(e) => handleCategoryChange(index, e.target.value)}
                 placeholder={`Categoría ${index + 1}`}
+                className={formErrors[`category-${index}`] ? 'error' : ''}
               />
               {formData.categories.length > 1 && ( // Permite eliminar si hay más de una
                 <button type="button" onClick={() => removeCategoryField(index)} className="remove-field-button">X</button>
@@ -392,6 +467,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
             </div>
           ))}
           <button type="button" onClick={addCategoryField} className="add-field-button">Añadir más categorías</button>
+        {formErrors.categories && <p className="error-input-message">{formErrors.categories}</p>} 
         </div>
 
         {/* Ingredientes */}
@@ -404,29 +480,36 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 value={ing.name}
                 onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
                 placeholder="Nombre (Ej: Patatas)"
-                required={index === 0} // Primer ingrediente obligatorio
+                // required={index === 0} // Primer ingrediente obligatorio
+                className={formErrors[`ingredientName-${index}`] ? 'error' : ''}
               />
+            {formErrors[`ingredientName-${index}`] && <p className="error-input-message">{formErrors[`ingredientName-${index}`]}</p>}
               <input
                 type="number"
                 value={ing.quantity}
                 onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
                 placeholder="Cantidad (Ej: 500)"
-                required={index === 0}
+                // required={index === 0}
                 min="0"
+                className={formErrors[`ingredientQuantity-${index}`] ? 'error' : ''}
               />
+            {formErrors[`ingredientQuantity-${index}`] && <p className="error-input-message">{formErrors[`ingredientQuantity-${index}`]}</p>}
               <input
                 type="text"
                 value={ing.unit}
                 onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
                 placeholder="Unidad (Ej: gramos)"
-                required={index === 0}
+                // required={index === 0}
+                className={formErrors[`ingredientUnit-${index}`] ? 'error' : ''}
               />
+            {formErrors[`ingredientUnit-${index}`] && <p className="error-input-message">{formErrors[`ingredientUnit-${index}`]}</p>}
               {formData.ingredients.length > 1 && (
                 <button type="button" onClick={() => removeIngredientField(index)} className="remove-field-button">X</button>
               )}
             </div>
           ))}
           <button type="button" onClick={addIngredientField} className="add-field-button">Añadir más ingredientes</button>
+        {formErrors.ingredients && <p className="error-input-message">{formErrors.ingredients}</p>} 
         </div>
 
         {/* Instrucciones (Pasos) */}
@@ -440,13 +523,16 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 onChange={(value) => handleInstructionChange(index, value)}
                 placeholder={`Paso ${index + 1}`}
                 rows={3}
+                className={formErrors[`instructionStep-${index}`] ? 'error' : ''} // Añadir clase de error si hay formErrors
               />
               {formData.instructions.length > 1 && (
                 <button type="button" onClick={() => removeInstructionField(index)} className="remove-field-button">X</button>
               )}
+            {formErrors[`instructionStep-${index}`] && <p className="error-input-message">{formErrors[`instructionStep-${index}`]}</p>}
             </div>
           ))}
           <button type="button" onClick={addInstructionField} className="add-field-button">Añadir más pasos</button>
+        {formErrors.instructions && <p className="error-input-message">{formErrors.instructions}</p>}
         </div>
 
         {/* Campos Numéricos y BasedOn */}
@@ -463,7 +549,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                         onChange={handleChange}
                         placeholder="Ej: 30"
                         min="0"
+                        className={formErrors.prepTime ? 'error' : ''} // Añadir clase de error si hay formErrors
                     />
+                {formErrors.prepTime && <p className="error-input-message">{formErrors.prepTime}</p>} 
                 </div>
                 <div className="form-group-inline">
                     <label htmlFor="cookTime">Tiempo de Cocción (minutos)</label>
@@ -475,7 +563,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                         onChange={handleChange}
                         placeholder="Ej: 20"
                         min="0"
+                        className={formErrors.cookTime ? 'error' : ''} // Añadir clase de error si hay formErrors
                     />
+                {formErrors.cookTime && <p className="error-input-message">{formErrors.cookTime}</p>}
                 </div>
                 <div className="form-group-inline">
                     <label htmlFor="servings">Número de Raciones</label>
@@ -487,7 +577,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                         onChange={handleChange}
                         placeholder="Ej: 4"
                         min="1"
+                        className={formErrors.servings ? 'error' : ''} // Añadir clase de error si hay formErrors
                     />
+                {formErrors.servings && <p className="error-input-message">{formErrors.servings}</p>} 
                 </div>
             </div>
             <div className="form-group">
