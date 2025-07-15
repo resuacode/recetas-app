@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RecipeCard from './RecipeCard'; // Reutilizamos RecipeCard
+import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,6 +32,7 @@ const RecipeManagement = ({ currentUser }) => {
       setUserRecipes(response.data);
     } catch (err) {
       console.error('Error al cargar las recetas del usuario:', err);
+      toast.error('No se pudieron cargar tus recetas. Inténtalo de nuevo más tarde.');
       setError('No se pudieron cargar tus recetas. Inténtalo de nuevo más tarde.');
     } finally {
       setLoading(false);
@@ -65,10 +67,10 @@ const RecipeManagement = ({ currentUser }) => {
         await axios.delete(`${API_URL}/recipes/${recipeId}`, config);
         // Actualizar la lista después de eliminar
         setUserRecipes(userRecipes.filter(recipe => recipe._id !== recipeId));
-        alert('Receta eliminada correctamente.');
+        toast.success('Receta eliminada correctamente.');
       } catch (err) {
         console.error('Error al eliminar la receta:', err);
-        alert('No se pudo eliminar la receta. Asegúrate de tener permisos.');
+        toast.error('No se pudo eliminar la receta. Asegúrate de tener permisos.');
       }
     }
   };

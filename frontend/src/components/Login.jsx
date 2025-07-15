@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -18,8 +19,8 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
         username,
         password,
       });
-      setMessage('¡Inicio de sesión exitoso!');
-      console.log('Inicio de sesión:', response.data);
+      toast.success('¡Inicio de sesión exitoso!');
+      // console.log('Inicio de sesión:', response.data);
 
       // Almacena el token JWT y la información del usuario
       // IMPORTANTE: En una aplicación real, esto se manejaría con un contexto/estado global
@@ -37,7 +38,7 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
       setUsername('');
       setPassword('');
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error en el inicio de sesión');
+      toast.error(error.response?.data?.message || 'Error en el inicio de sesión');
       console.error('Error al iniciar sesión:', error.response?.data || error.message);
     }
   };

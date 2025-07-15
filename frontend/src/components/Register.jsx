@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -16,13 +17,14 @@ const Register = () => {
         username,
         password,
       });
-      setMessage('¡Registro exitoso! Ya puedes iniciar sesión.');
-      console.log('Usuario registrado:', response.data);
+      toast.success('¡Registro exitoso! Ya puedes iniciar sesión.');
+      // console.log('Usuario registrado:', response.data);
       // Opcional: podrías limpiar el formulario o redirigir al login
       setUsername('');
       setPassword('');
+      
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error en el registro');
+      toast.error(error.response?.data?.message || 'Error en el registro');
       console.error('Error al registrar usuario:', error.response?.data || error.message);
     }
   };

@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importa Router, Routes, Route, Navigate
+import { Toaster } from 'react-hot-toast';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -69,6 +70,33 @@ function App() {
 
   return (
      <Router>
+      <Toaster // Coloca el Toaster aquí. Puedes añadirle props como position="top-right"
+        position="bottom-center" // Opciones: "top-left", "top-center", "top-right", "bottom-left", "bottom-center", "bottom-right"
+        reverseOrder={false} // Para que los toasts más nuevos aparezcan arriba
+        toastOptions={{
+          // Default options for specific toast types
+          success: {
+            duration: 3000,
+            style: {
+              background: '#28a745', // Verde para éxito
+              color: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              background: '#dc3545', // Rojo para error
+              color: '#fff',
+            },
+          },
+          // Puedes añadir estilos generales aquí o por tipo
+          style: {
+            fontSize: '1rem',
+            padding: '16px',
+            borderRadius: '8px',
+          },
+        }}
+      />
       <div className="app-container">
         {/* Header siempre visible */}
         <Header

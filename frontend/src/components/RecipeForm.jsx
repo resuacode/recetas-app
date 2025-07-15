@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -116,6 +117,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
       });
     } catch (err) {
       console.error('Error al cargar la receta para editar:', err);
+      toast.error('No se pudo cargar la receta para editar. Asegúrate de que existe o inténtalo más tarde.');
       setError('No se pudo cargar la receta para editar. Asegúrate de que existe o inténtalo más tarde.');
       // Si hay un error, redirigir a la página de gestión
       navigate('/manage-recipes');
@@ -209,22 +211,22 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
 
     // Validaciones en el frontend (básicas)
     if (!formData.title.trim() || !formData.description.trim()) {
-        setError('El título y la descripción son obligatorios.');
+        toast.error('El título y la descripción son obligatorios.');
         setSaving(false);
         return;
     }
     if (formData.categories.filter(cat => cat.trim()).length === 0) {
-        setError('Debes añadir al menos una categoría.');
+        toast.error('Debes añadir al menos una categoría.');
         setSaving(false);
         return;
     }
     if (formData.ingredients.filter(ing => ing.name.trim() && ing.quantity && ing.unit.trim()).length === 0) {
-        setError('Debes añadir al menos un ingrediente completo.');
+        toast.error('Debes añadir al menos un ingrediente completo.');
         setSaving(false);
         return;
     }
     if (formData.instructions.filter(inst => inst.step.trim()).length === 0) {
-        setError('Debes añadir al menos un paso de instrucción.');
+        toast.error('Debes añadir al menos un paso de instrucción.');
         setSaving(false);
         return;
     }
@@ -282,16 +284,16 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
       let response;
       if (type === 'create') {
         response = await axios.post(`${API_URL}/recipes`, dataToSend, config);
-        alert('Receta creada exitosamente!');
+        toast.success('Receta creada exitosamente!');
       } else { // 'edit'
         response = await axios.put(`${API_URL}/recipes/${id}`, dataToSend, config);
-        alert('Receta actualizada exitosamente!');
+        toast.success('Receta actualizada exitosamente!');
       }
       // console.log('Respuesta del servidor:', response.data);
       navigate('/manage-recipes'); // Redirigir a la gestión de recetas
     } catch (err) {
       console.error('Error al guardar la receta:', err.response?.data?.message || err.message);
-      setError(err.response?.data?.message || 'Error al guardar la receta. Inténtalo de nuevo.');
+      toast.error(err.response?.data?.message || 'Error al guardar la receta. Inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
