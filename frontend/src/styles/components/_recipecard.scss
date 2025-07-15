@@ -1,0 +1,60 @@
+
+.recipe-card {
+  background-color: var(--background-color); /* Fondo ligeramente diferente al de la lista */
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-light);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.recipe-card h3 {
+  color: var(--primary-dark);
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1.4rem;
+}
+
+.recipe-card p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #555;
+}
+
+.recipe-categories {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.recipe-categories .category-chip {
+  background-color: var(--accent-color);
+  color: var(--text-color-light);
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+}
+
+.recipe-author {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.error-message {
+  color: var(--error-color);
+  background-color: rgba(var(--error-color-rgb), 0.1); /* Asumiendo que defines RGB para error-color */
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--error-color);
+  text-align: center;
+  margin-top: 20px;
+}

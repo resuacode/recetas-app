@@ -1,0 +1,170 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Asegura que el footer esté al final */
+  max-width: var(--max-app-width); /* Limita el ancho máximo de toda la aplicación */
+  margin: 0 auto; /* ¡Centra el contenedor principal en la pantalla! */
+}
+
+
+/* --- Media Queries para Responsividad --- */
+
+/* Para pantallas más pequeñas (móviles) */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column; /* Apila elementos en columna */
+    padding: 1rem var(--padding-small);
+    gap: 10px;
+  }
+
+  .header-left, .header-right {
+    width: 100%; /* Ocupa todo el ancho */
+    text-align: center;
+  }
+
+  .user-info {
+    justify-content: center; /* Centra el texto y botón de cerrar sesión */
+    font-size: 0.9rem;
+    gap: 10px;
+  }
+
+  .header-center h1 {
+    font-size: 1.8rem; /* Reduce el tamaño del título */
+  }
+
+  .app-main-content {
+    padding: var(--padding-small); /* Menos padding en pantallas pequeñas */
+  }
+
+  .auth-section, .recipe-list-container {
+    padding: 1.5rem; /* Reduce el padding interno */
+    max-width: 95%; /* Ocupa más ancho en móviles */
+    margin: 0 auto; /* Asegura el centrado en móviles si el ancho es menor al 100% */
+  }
+
+  .auth-section h2, .recipe-list-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .auth-section button[type="submit"],
+  .auth-section button,
+  .search-bar button {
+    padding: 10px 20px; /* Ajusta el padding de los botones */
+    font-size: 0.9rem;
+  }
+
+  .app-footer {
+    padding: 1rem var(--padding-small);
+    font-size: 0.8rem;
+  }
+
+  .app-footer .social-links {
+    display: flex;
+    flex-direction: column; /* Apila los enlaces en móviles */
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .app-footer .social-links a {
+    margin: 0; /* Elimina el margen lateral */
+  }
+
+    .recipe-list-container {
+    padding: 1.5rem;
+  }
+
+  .filters-and-sort {
+    flex-direction: column; /* Apila los filtros en columnas en móviles */
+    align-items: stretch;
+  }
+
+  .search-bar-group input,
+  .category-input-group input,
+  .sort-by-group select {
+    margin-bottom: 10px; /* Espacio entre inputs apilados */
+  }
+
+  .recipes-grid {
+    grid-template-columns: 1fr; /* Una sola columna en móviles */
+  }
+
+  .recipe-management-container {
+    padding: 1.5rem;
+  }
+
+  .create-recipe-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+
+  .management-recipe-item {
+    flex-direction: column; /* Apila la tarjeta y los botones en móviles */
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .management-recipe-item .recipe-card {
+    margin-right: 0;
+    margin-bottom: 15px; /* Espacio entre tarjeta y botones apilados */
+    width: 100%; /* Ocupa todo el ancho */
+  }
+
+  .management-buttons {
+    flex-direction: row; /* Mantén los botones en fila */
+    justify-content: center;
+    width: 100%;
+  }
+
+  .management-buttons button {
+    flex-grow: 1; /* Permite que los botones se expandan */
+    padding: 10px 10px;
+    font-size: 0.9rem;
+  }
+
+  .recipe-form-container {
+    padding: 1.5rem;
+  }
+  .dynamic-field-item {
+    flex-direction: column; /* Apila inputs y botón en móvil */
+    align-items: stretch;
+  }
+  .dynamic-field-item input {
+    margin-bottom: 10px;
+  }
+  .remove-field-button {
+    width: 100%; /* El botón ocupa todo el ancho */
+    border-radius: 8px; /* Ajusta la forma */
+  }
+
+  .ingredient-item {
+    grid-template-columns: 1fr; /* Una columna en móvil */
+  }
+
+  .optional-fields-grid {
+      grid-template-columns: 1fr; /* Una columna en móvil */
+  }
+}
+
+/* Para pantallas aún más pequeñas (smartphones) */
+@media (max-width: 480px) {
+  .header-center h1 {
+    font-size: 1.6rem;
+  }
+
+  .auth-section input[type="text"],
+  .auth-section input[type="password"],
+  .search-bar input {
+    width: 100%; /* Asegura que los inputs ocupen todo el ancho disponible */
+  }
+
+  .search-bar {
+    flex-direction: column; /* Apila el input y el botón de búsqueda */
+  }
+
+  .recipe-card {
+    padding: 1rem;
+  }
+  .recipe-card h3 {
+    font-size: 1.2rem;
+  }
+}

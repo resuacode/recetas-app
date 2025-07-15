@@ -1,0 +1,27 @@
+
+/* Footer */
+.app-footer {
+  background-color: var(--text-color-dark);
+  color: var(--text-color-light);
+  padding: 1.5rem var(--padding-base);
+  text-align: center;
+  font-size: 0.9rem;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.app-footer p {
+  margin: 0.5rem 0;
+}
+
+.app-footer a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.app-footer a:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}

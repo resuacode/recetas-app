@@ -1,0 +1,11 @@
+/* Estilos generales */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color-dark);
+}
+
+* {
+  box-sizing: border-box; /* Asegura que padding y border no aumenten el ancho/alto */
+}

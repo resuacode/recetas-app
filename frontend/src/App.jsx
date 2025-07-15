@@ -11,7 +11,7 @@ import RecipeList from './components/RecipeList';
 import RecipeDetail from './components/RecipeDetail'; 
 import RecipeManagement from './components/RecipeManagement';
 import RecipeForm from './components/RecipeForm';
-import './App.css'; // Asegúrate de tener este archivo para los estilos
+import './App.scss'; // Asegúrate de tener este archivo para los estilos
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

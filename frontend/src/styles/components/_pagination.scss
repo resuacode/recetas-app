@@ -1,0 +1,55 @@
+
+  /* Estilos para el contenedor de paginación */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Espacio entre el selector y los botones */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Para que se ajusten en pantallas pequeñas */
+}
+
+.pagination-controls.bottom {
+    margin-top: 40px; /* Más espacio si está al final */
+}
+
+.recipes-per-page-group,
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.pagination-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.pagination-buttons span {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Ajustes para el select */
+.pagination-controls select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}

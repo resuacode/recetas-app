@@ -1,0 +1,83 @@
+/* Header */
+.app-header {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  padding: 1rem var(--padding-base);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-light);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.header-center {
+  flex-grow: 1; /* Permite que el título ocupe el espacio central */
+  text-align: center;
+}
+
+.header-center h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1rem;
+  white-space: nowrap; /* Evita que el texto de usuario se rompa */
+}
+
+.logout-button {
+  background-color: var(--error-color);
+  color: var(--text-color-light);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: var(--shadow-button);
+}
+
+.logout-button:hover {
+  background-color: var(--error-dark);
+}
+
+.manage-recipes-button {
+  background-color: var(--accent-color);
+  color: var(--text-color-light);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: var(--shadow-button);
+  text-decoration: none; /* Quita el subrayado de Link */
+  display: inline-block; /* Para que padding funcione correctamente */
+  margin-left: 10px; /* Espacio entre user info y este botón */
+}
+
+.manage-recipes-button:hover {
+  background-color: var(--accent-dark);
+}
+
+/* Estilos para el enlace del título en el header */
+.app-title-link { /* Esta es la clase que le pusimos al Link */
+  text-decoration: none; /* Elimina el subrayado */
+  color: var(--text-color-light); /* Asegura que el color sea blanco (o el que tengas en text-color-light) */
+  /* Opcional: Asegúrate de que el h1 dentro también herede el color si fuera necesario */
+}
+
+.app-title-link:hover {
+  color: var(--text-color-light); /* Mantiene el color blanco al pasar el ratón */
+  text-decoration: none; /* Asegura que no aparezca el subrayado al pasar el ratón */
+}
+
+.app-title { /* Tu h1 dentro del Link */
+  margin: 0; /* Elimina márgenes por defecto del h1 */
+  font-size: 1.8rem;
+  /* No necesitas un color aquí si el Link ya lo define */
+}
+
