@@ -170,88 +170,101 @@ const RecipeList = () => {
     <div className="recipe-list-container">
       <h2>Explorar Recetas</h2>
 
+      {/* Contenedor principal de filtros y ordenación, ahora más estructurado */}
       <div className="filters-and-sort">
-        <div className="search-bar-group">
-          <label htmlFor="search-title">Buscar por título:</label>
-          <input
-            id="search-title"
-            type="text"
-            placeholder="Escribe para buscar..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </div>
-
-        <div className="category-input-group">
-          <label htmlFor="add-category">Añadir categoría:</label>
-          <input
-            id="add-category"
-            type="text"
-            placeholder="Presiona Enter para añadir"
-            value={categoriesInput}
-            onChange={(e) => setCategoriesInput(e.target.value)}
-            onKeyPress={handleAddCategory}
-          />
-        </div>
-        {selectedCategories.length > 0 && (
-          <div className="category-chips-container">
-            {selectedCategories.map((cat, index) => (
-              <span key={index} className="category-chip">
-                {cat} <span className="remove-chip" onClick={() => handleRemoveCategory(cat)}>X</span>
-              </span>
-            ))}
+        {/* Fila 1: Filtros principales */}
+        <div className="filters-row-one">
+          <div className="search-bar-group">
+            <label htmlFor="search-title">Buscar por título:</label>
+            <input
+              id="search-title"
+              type="text"
+              placeholder="Escribe para buscar..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-        )}
 
-        <div className="author-filter-group">
-          <label htmlFor="filter-author">Filtrar por autor:</label>
-          <input
-            id="filter-author"
-            type="text"
-            placeholder="Nombre de usuario del autor..."
-            value={authorFilter}
-            onChange={handleAuthorFilterChange}
-          />
-        </div>
+          <div className="category-input-group">
+            <label htmlFor="add-category">Añadir categoría:</label>
+            <input
+              id="add-category"
+              type="text"
+              placeholder="Presiona Enter para añadir"
+              value={categoriesInput}
+              onChange={(e) => setCategoriesInput(e.target.value)}
+              onKeyPress={handleAddCategory}
+            />
+            {selectedCategories.length > 0 && (
+              <div className="category-chips-container">
+                {selectedCategories.map((cat, index) => (
+                  <span key={index} className="category-chip">
+                    {cat} <span className="remove-chip" onClick={() => handleRemoveCategory(cat)}>X</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div className="sort-by-group">
-          <label htmlFor="sortOrder">Ordenar por:</label>
-          <select id="sortOrder" value={sortOrder} onChange={handleSortChange}>
-            <option value="createdAt:desc">Más recientes</option>
-            <option value="createdAt:asc">Más antiguas</option>
-          </select>
-        </div>
+          <div className="author-filter-group">
+            <label htmlFor="filter-author">Filtrar por autor:</label>
+            <input
+              id="filter-author"
+              type="text"
+              placeholder="Nombre de usuario del autor..."
+              value={authorFilter}
+              onChange={handleAuthorFilterChange}
+            />
+          </div>
 
-        {/* --- CONTROLES DE PAGINACIÓN Y POR PÁGINA --- */}
-        <div className="pagination-controls">
-          <div className="recipes-per-page-group">
-            <label htmlFor="recipesPerPage">Recetas por página:</label>
-            <select id="recipesPerPage" value={recipesPerPage} onChange={handleRecipesPerPageChange}>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
+          <div className="sort-by-group">
+            <label htmlFor="sortOrder">Ordenar por:</label>
+            <select id="sortOrder" value={sortOrder} onChange={handleSortChange}>
+              <option value="createdAt:desc">Más recientes</option>
+              <option value="createdAt:asc">Más antiguas</option>
             </select>
           </div>
+        </div> {/* Fin .filters-row-one */}
 
-          <div className="pagination-buttons">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="pagination-button"
-            >
-              Anterior
-            </button>
-            <span>Página {currentPage} de {totalPages || 1}</span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="pagination-button"
-            >
-              Siguiente
-            </button>
+        {/* Fila 2: Ordenación */}
+        <div className="sort-row-two">
+          
+        </div> {/* Fin .sort-row-two */}
+
+        {/* Fila 3: Controles de Paginación */}
+        <div className="pagination-row-three">
+          <div className="pagination-controls">
+            <div className="recipes-per-page-group">
+              <label htmlFor="recipesPerPage">Recetas por página:</label>
+              <select id="recipesPerPage" value={recipesPerPage} onChange={handleRecipesPerPageChange}>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+
+            <div className="pagination-buttons">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="pagination-button"
+              >
+                Anterior
+              </button>
+              <span>Página {currentPage} de {totalPages || 1}</span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="pagination-button"
+              >
+                Siguiente
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
+        </div> {/* Fin .pagination-row-three */}
+
+      </div> {/* Fin .filters-and-sort */}
+
 
       <div className="recipes-grid">
         {displayedRecipes.length === 0 && totalFilteredCount > 0 ? (

@@ -120,21 +120,61 @@
   flex-wrap: wrap; /* Permite que los elementos se envuelvan en líneas nuevas */
   gap: 15px; /* Espacio entre los grupos de filtros */
   margin-bottom: 25px;
-  align-items: flex-end; /* Alinea los elementos en la parte inferior */
+}
+
+/* Estilos para las filas individuales de filtros/ordenación/paginación */
+.filters-row-one,
+.sort-row-two,
+.pagination-row-three {
+  display: flex;
+  flex-direction: column; /* Por defecto, apila los elementos en móvil */
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan si hay espacio */
+  gap: 15px; /* Espacio entre los elementos DENTRO de cada fila */
+  align-items: flex-start; /* Alinea los inputs y selects al inicio de su fila */
+  width: 100%; /* Ocupa el 100% del ancho de su contenedor */
+}
+
+/* Ajustes específicos para PC - Media Query */
+@media (min-width: 768px) {
+  .filters-row-one,
+  .sort-row-two,
+  .pagination-row-three {
+    flex-direction: row; /* ¡Aquí la clave! Muestra los elementos en una fila en PC */
+    align-items: flex-end; /* Alinea los inputs y selects en la base en PC */
+  }
+
+  .filters-row-one {
+    justify-content: space-between; /* Distribuye los filtros equitativamente */
+  }
+
+  .sort-row-two {
+    justify-content: flex-start; /* O al inicio si solo hay uno */
+  }
+
+  .pagination-row-three {
+    justify-content: center; /* Centra los controles de paginación */
+  }
 }
 
 .search-bar-group,
 .category-input-group,
+.author-filter-group,
 .sort-by-group {
   display: flex;
   flex-direction: column;
   flex: 1; /* Permite que los grupos crezcan y se encojan */
   min-width: 200px; /* Ancho mínimo para evitar que se compriman demasiado */
+  width: 100%; /* Asegura que cada grupo ocupe el 100% del ancho disponible */
+  @media (min-width: 768px){
+    width: auto; /* En pantallas más grandes, los grupos pueden ocupar su ancho natural */
+  }
 }
 
 .search-bar-group input,
 .category-input-group input,
-.sort-by-group select {
+.author-filter-group input,
+.sort-by-group select,
+.recipes-per-page-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid var(--border-color);
@@ -142,9 +182,13 @@
   box-sizing: border-box;
   color: var(--text-color-dark);
   background-color: var(--card-background);
+  &::placeholder {
+    color: var(--placeholder-color);
+  }
 }
 
 .filters-and-sort label {
+  width: 300px;
   margin-bottom: 5px;
   font-weight: bold;
   color: var(--text-color-dark);
@@ -156,6 +200,7 @@
   gap: 8px;
   margin-top: 10px;
   width: 100%; /* Ocupa todo el ancho disponible */
+  flex-basis: 100%;
 }
 
 .category-chip {

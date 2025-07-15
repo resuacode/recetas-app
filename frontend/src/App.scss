@@ -1,24 +1,24 @@
 // 1. Importar variables y mixins (deben ir primero)
-@import './styles/variables';
-@import './styles/mixins';
+@use 'styles/variables';
+@use 'styles/mixins';
 
 // 2. Estilos base y globales
-@import './styles/base';
-@import './styles/layout';
-@import './styles/utilities';
+@use 'styles/base';
+@use 'styles/layout';
+@use 'styles/utilities';
 
 // 3. Estilos de componentes
-@import './styles/components/header';
-@import './styles/components/footer';
-@import './styles/components/recipecard';
-@import './styles/components/pagination';
-@import './styles/components/navbar';
-@import './styles/components/recipeform';
+@use 'styles/components/header';
+@use 'styles/components/footer';
+@use 'styles/components/recipecard';
+@use 'styles/components/pagination';
+@use 'styles/components/navbar';
+@use 'styles/components/recipeform';
 
 // 4. Estilos de páginas específicas
-@import './styles/pages/homepage';
-@import './styles/pages/recipedetail';
-@import './styles/pages/managerecipes';
+@use 'styles/pages/homepage';
+@use 'styles/pages/recipedetail';
+@use 'styles/pages/managerecipes';
 
 /* frontend/src/App.scss */
 
