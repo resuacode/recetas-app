@@ -66,7 +66,6 @@ const RecipeDetail = () => {
 
   return (
     <div className="recipe-detail-container">
-      <button onClick={() => navigate(-1)} className="back-button">← Volver</button> {/* Botón para volver */}
       <h2>{recipe.title}</h2>
       <p className="recipe-description">{recipe.description}</p>
 
@@ -78,7 +77,6 @@ const RecipeDetail = () => {
       {/* Mostrar imágenes si existen */}
       {recipe.imagesUrl && recipe.imagesUrl.length > 0 && (
         <div className="recipe-images">
-          <h3>Imágenes:</h3>
           {recipe.imagesUrl.map((image, index) => (
             <img key={index} src={image} alt={`Imagen de ${recipe.title} ${index + 1}`} className="recipe-image" />
           ))}
@@ -141,6 +139,7 @@ const RecipeDetail = () => {
         )}
         
       </div>
+        <button onClick={() => navigate(-1)} className="back-button">Volver a la lista de recetas</button> {/* Botón para volver */}
     </div>
   );
 };

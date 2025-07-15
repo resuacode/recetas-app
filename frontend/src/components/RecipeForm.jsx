@@ -1,10 +1,13 @@
 // frontend/src/components/RecipeForm.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 // Componente auxiliar para un campo de texto con negrita/cursiva
 const RichTextarea = ({ value, onChange, placeholder, rows = 3 }) => {
@@ -69,11 +72,12 @@ const RichTextarea = ({ value, onChange, placeholder, rows = 3 }) => {
 const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData como prop
   const navigate = useNavigate();
   const { id } = useParams(); // Obtiene el ID si estamos en modo edición
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    imagesUrl: [''],
+    imagesUrl: [],
     videoUrl: '',
     categories: [''],
     ingredients: [{ name: '', quantity: '', unit: '' }],
@@ -88,6 +92,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
   const [error, setError] = useState(null); // Quizás estaría bien renombrarlo a globalError o algo así
   const [loadingForm, setLoadingForm] = useState(true); // Nuevo estado para la carga inicial del formulario
   const [saving, setSaving] = useState(false); // Estado para el proceso de guardar
+  const [uploadingImage, setUploadingImage] = useState(false); 
 
   const fetchRecipe = useCallback(async () => {
     setLoadingForm(true);
@@ -106,7 +111,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
       setFormData({
         title: recipeData.title || '',
         description: recipeData.description || '',
-        imagesUrl: recipeData.imagesUrl?.length > 0 ? recipeData.imagesUrl : [''],
+        imagesUrl: recipeData.imagesUrl?.length > 0 ? recipeData.imagesUrl : [],
         videoUrl: recipeData.videoUrl || '',
         categories: recipeData.categories?.length > 0 ? recipeData.categories : [''],
         ingredients: recipeData.ingredients?.length > 0 ? recipeData.ingredients : [{ name: '', quantity: '', unit: '' }],
@@ -136,7 +141,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
       setFormData({
         title: '',
         description: '',
-        imagesUrl: [''],
+        imagesUrl: [],
         videoUrl: '',
         categories: [''],
         ingredients: [{ name: '', quantity: '', unit: '' }],
@@ -157,17 +162,86 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
 
   // --- Manejo de Arrays Dinámicos ---
 
-  // Imágenes
-  const handleImageChange = (index, value) => {
-    const newImages = [...formData.imagesUrl];
-    newImages[index] = value;
-    setFormData({ ...formData, imagesUrl: newImages });
-  };
-  const addImageField = () => setFormData({ ...formData, imagesUrl: [...formData.imagesUrl, ''] });
-  const removeImageField = (index) => {
-    const newImages = formData.imagesUrl.filter((_, i) => i !== index);
-    setFormData({ ...formData, imagesUrl: newImages.length > 0 ? newImages : [''] }); // Asegura al menos un campo
-  };
+
+    // La función handleImageChange ya no es para inputs de URL, sino para la URL de Cloudinary
+    // Se elimina el addImageField y removeImageField para inputs de URL.
+    // Ahora, `imagesUrl` se gestionará completamente por la subida de archivos.
+    // Si quieres múltiples imágenes, tendrías que permitir múltiples subidas o una para cada campo.
+    // Para simplificar, vamos a permitir que el usuario suba UNA imagen por el momento.
+    // Si necesitas múltiples imágenes, la lógica de `handleImageUpload` necesitaría ajustarse.
+   
+
+   // Función para manejar la subida de la imagen a Cloudinary
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        setFormErrors(prev => ({ ...prev, imageFile: undefined })); // Limpiar error previo
+
+        if (!file) {
+            // No file selected, could show a message if desired
+            return;
+        }
+
+        // Validación de tipo de archivo
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+        if (!validImageTypes.includes(file.type)) {
+            toast.error('Formato de imagen no válido. Por favor, usa JPG, PNG, GIF, WebP, HEIC, o HEIF.');
+            setFormErrors(prev => ({ ...prev, imageFile: 'Formato de imagen no válido. (JPG, PNG, GIF, WebP, HEIC, HEIF)' }));
+            return;
+        }
+
+        // Validación de tamaño de archivo (ej. máximo 5MB)
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+        if (file.size > MAX_FILE_SIZE) {
+            toast.error('La imagen es demasiado grande. Tamaño máximo: 5MB.');
+            setFormErrors(prev => ({ ...prev, imageFile: 'La imagen es demasiado grande. (Máx. 5MB)' }));
+            return;
+        }
+
+        setUploadingImage(true);
+        const formDataCloudinary = new FormData();
+        formDataCloudinary.append('file', file);
+        formDataCloudinary.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        // formDataCloudinary.append('cloud_name', CLOUDINARY_CLOUD_NAME); // No es estrictamente necesario aquí si ya está en la URL
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formDataCloudinary,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error de Cloudinary:', errorData);
+                toast.error(`Error al subir la imagen: ${errorData.error?.message || 'Problema con Cloudinary.'}`);
+                setFormErrors(prev => ({ ...prev, imageFile: errorData.error?.message || 'Error desconocido al subir imagen.' }));
+                return;
+            }
+
+            const data = await response.json();
+            // Actualiza el estado imagesUrl con la nueva URL (reemplaza la existente si es edición, o añade si es nueva)
+            // Asumimos que solo queremos una imagen principal por receta.
+            // Si quieres múltiples imágenes, deberías cambiar la lógica aquí
+            // para añadir la nueva URL a `formData.imagesUrl`.
+            setFormData(prev => ({ ...prev, imagesUrl: [data.secure_url] })); // Reemplaza la primera imagen
+            toast.success('Imagen subida!');
+        } catch (error) {
+            console.error('Error al subir la imagen:', error);
+            toast.error('Error de red o desconocido al subir la imagen. Inténtalo de nuevo.');
+            setFormErrors(prev => ({ ...prev, imageFile: 'Error de red o desconocido al subir la imagen.' }));
+        } finally {
+            setUploadingImage(false);
+            // Limpia el input de archivo para permitir otra selección si es necesario
+            e.target.value = '';
+        }
+    };
+
+    // Función para eliminar una imagen previamente subida (mostrada en la previsualización)
+    const removeUploadedImage = (indexToRemove) => {
+        setFormData(prev => ({
+            ...prev,
+            imagesUrl: prev.imagesUrl.filter((_, index) => index !== indexToRemove)
+        }));
+    };
 
   // Categorías
   const handleCategoryChange = (index, value) => {
@@ -271,14 +345,16 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
         newErrors.servings = 'El número de raciones debe ser un número positivo (al menos 1).';
     }
 
+    // Opcional si queremos imagen obligatoria: validación: Asegurarse de que al menos una imagen ha sido subida
+    /*
+    if (formData.imagesUrl.length === 0) {
+        newErrors.imagesUrl = 'Debes subir al menos una imagen para la receta.';
+    }
+        */
+
     // Validar formato URL (para imagesUrl y videoUrl)
     const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/; 
 
-    formData.imagesUrl.forEach((url, index) => {
-        if (url.trim() !== '' && !urlRegex.test(url)) {
-            newErrors[`imageUrl-${index}`] = `La URL de la imagen ${index + 1} no es válida.`;
-        }
-    });
     if (formData.videoUrl.trim() !== '' && !urlRegex.test(formData.videoUrl.trim())) {
         newErrors.videoUrl = 'La URL del video no es válida.';
     }
@@ -410,28 +486,41 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
           {formErrors.description && <p className="error-input-message">{formErrors.description}</p>}
         </div>
 
-        {/* Imágenes URL */}
-        <div className="form-group dynamic-fields-group">
-          <label>Imágenes (URLs)</label>
-          {formData.imagesUrl.map((url, index) => (
-            <div key={index} className="dynamic-field-item">
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => handleImageChange(index, e.target.value)}
-                className={formErrors[`imageUrl-${index}`] ? 'error' : ''}
-                placeholder={`URL de imagen ${index + 1}`}
-              />
-              {formData.imagesUrl.length > 1 && (
-                <button type="button" onClick={() => removeImageField(index)} className="remove-field-button">X</button>
-              )}
-             {formErrors[`imageUrl-${index}`] && <p className="error-input-message">{formErrors[`imageUrl-${index}`]}</p>} 
+         {/* Campo de subida de Imagen a Cloudinary */}
+         <div className="form-group">
+            <label htmlFor="recipeImage">Imagen de la Receta</label>
+            <input
+                type="file"
+                id="recipeImage"
+                accept="image/jpeg, image/png, image/gif, image/webp, image/heic, image/heif" // Acepta estos tipos de archivo
+                onChange={handleImageUpload}
+                disabled={uploadingImage} // Deshabilita el input mientras se sube
+                // className={formErrors.imageFile ? 'error' : ''}
+                className="hidden-file-input" // Clase para ocultar el input real
+                ref={fileInputRef} // Asocia la ref
+            />
 
-            </div>
-          ))}
-          <button type="button" onClick={addImageField} className="add-field-button">Añadir más imágenes</button>
-          {formErrors.imagesUrl && <p className="error-input-message">{formErrors.imagesUrl}</p>} {/* Error general para el grupo */}
+            {/* Botón personalizado para disparar la selección de archivo */}
+            <label htmlFor="recipeImage" className="custom-file-upload-button" disabled={uploadingImage}>
+                {uploadingImage ? 'Subiendo...' : 'Seleccionar Imagen'}
+            </label>
 
+            {uploadingImage && <p className="uploading-message">Subiendo imagen...</p>}
+            {formErrors.imageFile && <p className="error-input-message">{formErrors.imageFile}</p>}
+
+            {/* Previsualización de imágenes subidas */}
+            {formData.imagesUrl && formData.imagesUrl.length > 0 && (
+                <div className="uploaded-images-preview">
+                    <p>Imagen actual:</p>
+                    {formData.imagesUrl.map((url, index) => (
+                        <div key={index} className="uploaded-image-item">
+                            <img src={url} alt={`Imagen ${index + 1}`} />
+                            <button type="button" onClick={() => removeUploadedImage(index)} className="remove-image-button">Eliminar</button>
+                        </div>
+                    ))}
+                </div>
+            )}
+            {formErrors.imagesUrl && <p className="error-input-message">{formErrors.imagesUrl}</p>}
         </div>
 
         {/* Video URL */}

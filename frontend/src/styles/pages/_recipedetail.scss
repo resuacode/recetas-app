@@ -45,6 +45,7 @@
 }
 
 .recipe-image {
+  max-height: 550px; /* Limita la altura máxima de las imágenes */
   max-width: 100%;
   height: auto;
   border-radius: 10px;
