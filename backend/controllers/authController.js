@@ -34,7 +34,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Restablecimiento de Contraseña para TuAppName',
+      subject: 'Restablecimiento de Contraseña para Rescetario by dr.eats',
       message
     });
 
