@@ -11,10 +11,17 @@ const Register = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [acceptPrivacyPolicy, setAcceptPrivacyPolicy] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Evita que la página se recargue
     setLoading(true);
+
+    // Validación para aceptar la política de privacidad
+    if (!acceptPrivacyPolicy) {
+      toast.error('Debes aceptar la Política de Privacidad.');
+      return;
+    }
 
     // Validaciones básicas en el frontend
     if (password !== passwordConfirm) {
@@ -99,6 +106,20 @@ const Register = () => {
             disabled={loading}
           />
         </div>
+
+         <div className="form-group privacy-checkbox">
+          <input
+            type="checkbox"
+            id="acceptPrivacyPolicy"
+            checked={acceptPrivacyPolicy}
+            onChange={(e) => setAcceptPrivacyPolicy(e.target.checked)}
+            required // Esto hace que el checkbox sea obligatorio
+          />
+          <label htmlFor="acceptPrivacyPolicy">
+            He leído y acepto la <a href="/politica-de-privacidad" target="_blank" rel="noopener noreferrer">Política de Privacidad</a>.
+          </label>
+        </div>
+        
         <button type="submit" disabled={loading}>
           {loading ? 'Registrando...' : 'Registrar'}
         </button>      

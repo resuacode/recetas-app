@@ -1,0 +1,50 @@
+.legal-document-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+  color: #333;
+
+  h1, h2 {
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 10px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+
+  a {
+    color: #007bff; // Un azul estándar para enlaces
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

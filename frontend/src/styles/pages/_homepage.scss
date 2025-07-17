@@ -97,6 +97,36 @@
   transform: none;
 }
 
+
+.privacy-checkbox {
+  display: flex;
+  align-items: center;
+  margin-top: 25px;
+  margin-bottom: 20px; /* Espacio extra para el botón */
+
+  input[type="checkbox"] {
+    margin-right: 10px;
+    width: auto; /* Anular el ancho 100% que podría tener el input general */
+  }
+
+  label {
+    font-size: 0.9em;
+    display: flex; // Para alinear el texto si es largo
+    align-items: center;
+    cursor: pointer;
+  }
+
+  a {
+    color: #007bff; // Color para el enlace
+    text-decoration: none;
+    margin-left: 5px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 // Estilos para el enlace "Volver al inicio de sesión"
   .form-links {
     margin-top: 1.5rem;
