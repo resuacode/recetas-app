@@ -2,6 +2,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const compression = require('compression');
 const connectDB = require('./config/db');
 // Importar rutas
 const userRoutes = require('./routes/userRoutes');
@@ -17,8 +18,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
+
+
+// Middleware de compresión. Se recomienda colocarlo al principio, después de express.json()
+// para que comprima todas las respuestas.
+app.use(compression());
+
 
 
 // Configuración de CORS
