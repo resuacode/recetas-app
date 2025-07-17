@@ -6,6 +6,7 @@ const {
   createRecipe,
   updateRecipe,
   deleteRecipe,
+  getUserRecipes,
 } = require('../controllers/recipeController');
 const { protect, authorize } = require('../middleware/authMiddleware'); // Middleware para proteger y autorizar
 const router = express.Router();
@@ -13,6 +14,9 @@ const router = express.Router();
 // Rutas accesibles para todos (GET)
 // GET /api/recipes
 router.get('/', getRecipes);
+// Ruta para obtener recetas del usuario autenticado
+// GET /api/recipes/my-recipes
+router.get('/my-recipes', protect, authorize(['admin']), getUserRecipes); 
 // GET /api/recipes/:id
 router.get('/:id', getRecipeById);
 
@@ -24,5 +28,8 @@ router.post('/', protect, authorize(['admin']), createRecipe);
 router.put('/:id', protect, authorize(['admin']), updateRecipe);
 // DELETE /api/recipes/:id
 router.delete('/:id', protect, authorize(['admin']), deleteRecipe);
+
+
+
 
 module.exports = router;

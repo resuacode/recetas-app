@@ -47,6 +47,18 @@ const getRecipeById = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Obtener las recetas del usuario autenticado (privado/admin)
+// @route   GET /api/recipes/my-recipes
+// @access  Private/Admin
+const getUserRecipes = asyncHandler(async (req, res) => {
+  // req.user._id viene del middleware `protect` y contiene el ID del usuario autenticado
+  const recipes = await Recipe.find({ author: req.user._id }).populate(
+    'author',
+    'username'
+  );
+  res.json(recipes);
+});
+
 // @desc    Crear una nueva receta
 // @route   POST /api/recipes
 // @access  Private/Admin
@@ -145,4 +157,5 @@ module.exports = {
   createRecipe,
   updateRecipe,
   deleteRecipe,
+  getUserRecipes,
 };

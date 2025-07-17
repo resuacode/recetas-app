@@ -24,11 +24,10 @@ const RecipeManagement = ({ currentUser }) => {
           Authorization: `Bearer ${token}`,
         },
         params: {
-          author: currentUser.username, // Filtra por el nombre de usuario del admin
           sortBy: 'createdAt:desc', // Por defecto, las más recientes primero
         },
       };
-      const response = await axios.get(`${API_URL}/recipes`, config);
+      const response = await axios.get(`${API_URL}/recipes/my-recipes`, config);
       setUserRecipes(response.data);
     } catch (err) {
       console.error('Error al cargar las recetas del usuario:', err);
@@ -37,7 +36,7 @@ const RecipeManagement = ({ currentUser }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]); // Depende del currentUser para asegurar que se carga para el usuario correcto
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
