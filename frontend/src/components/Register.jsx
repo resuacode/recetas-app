@@ -6,26 +6,48 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Register = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Evita que la página se recargue
+    setLoading(true);
+
+    // Validaciones básicas en el frontend
+    if (password !== passwordConfirm) {
+      toast.error('Las contraseñas no coinciden.');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(`${API_URL}/users/register`, {
         username,
+        email,
         password,
+        passwordConfirm
       });
       toast.success('¡Registro exitoso! Ya puedes iniciar sesión.');
       // console.log('Usuario registrado:', response.data);
       // Opcional: podrías limpiar el formulario o redirigir al login
       setUsername('');
+      setEmail('');
       setPassword('');
       
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error en el registro');
       console.error('Error al registrar usuario:', error.response?.data || error.message);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -43,6 +65,18 @@ const Register = () => {
             required
           />
         </div>
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email" // Tipo email para validación automática del navegador
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu_email@ejemplo.com"
+            required
+            disabled={loading}
+          />
+        </div>
         <div>
           <label htmlFor="password">Contraseña:</label>
           <input
@@ -53,8 +87,22 @@ const Register = () => {
             required
           />
         </div>
-        <button type="submit">Registrar</button>
-      </form>
+        <div className="form-group">
+          <label htmlFor="passwordConfirm">Confirmar Contraseña:</label>
+          <input
+            type="password"
+            id="passwordConfirm"
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            placeholder="Repite tu contraseña"
+            required
+            disabled={loading}
+          />
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Registrando...' : 'Registrar'}
+        </button>      
+        </form>
       {message && <p className="message">{message}</p>}
     </div>
   );

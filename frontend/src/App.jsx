@@ -7,6 +7,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Register from './components/Register';
 import Login from './components/Login';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import RecipeList from './components/RecipeList';
 import RecipeDetail from './components/RecipeDetail'; 
 import RecipeManagement from './components/RecipeManagement';
@@ -131,6 +133,10 @@ function App() {
                 )
               }
             />
+            {/* La ruta para el formulario de olvidó la contraseña */}
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            {/* La ruta para restablecer contraseña debe aceptar el token como query param */}
+            <Route path="/reset-password" element={<ResetPassword />} /> 
             {/* Ruta para la vista de detalle de la receta */}
             <Route
               path="/recipes/:id"

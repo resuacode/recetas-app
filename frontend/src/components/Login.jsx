@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -69,6 +70,9 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
         </div>
         <button type="submit">Iniciar Sesión</button>
       </form>
+      <div className="form-links">
+        <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+      </div>
       {message && <p className="message">{message}</p>}
     </div>
   );

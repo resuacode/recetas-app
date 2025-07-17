@@ -8,7 +8,7 @@
   align-items: flex-start;
 }
 
-.auth-section, .recipe-list-container {
+.auth-section, .recipe-list-container, .auth-container {
   background-color: var(--card-background);
   padding: 2.5rem;
   border-radius: 15px;
@@ -18,18 +18,18 @@
   text-align: center;
 }
 
-.auth-section h2, .recipe-list-container h2 {
+.auth-section h2, .recipe-list-container h2, .auth-container h2 {
   color: var(--primary-color);
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
 }
 
-.auth-section form div {
+.auth-section form div, .auth-container form div {
   margin-bottom: 1rem;
   text-align: left;
 }
 
-.auth-section label {
+.auth-section label, .auth-container label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
@@ -38,6 +38,9 @@
 
 .auth-section input[type="text"],
 .auth-section input[type="password"],
+.auth-section input[type="email"],
+.auth-container input[type="email"],
+.auth-container input[type="password"],
 .search-bar input {
   width: calc(100% - 20px);
   padding: 10px;
@@ -48,12 +51,14 @@
 }
 
 .auth-section input::placeholder,
+.auth-container input::placeholder,
 .search-bar input::placeholder {
   color: var(--placeholder-color);
 }
 
 
 .auth-section button[type="submit"],
+.auth-container button[type="submit"],
 .auth-section button { /* Para los botones de "Inicia Sesión" / "Regístrate aquí" */
   background-color: var(--primary-color);
   color: var(--text-color-light);
@@ -67,12 +72,14 @@
   margin-top: 1rem;
 }
 
-.auth-section button:hover {
+.auth-section button:hover,
+.auth-container button:hover {
   background-color: var(--primary-dark);
   transform: translateY(-2px);
 }
 
-.auth-section p button {
+.auth-section p button,
+.auth-container p button {
   background: none;
   color: var(--primary-color);
   border: none;
@@ -84,10 +91,27 @@
   box-shadow: none;
 }
 
-.auth-section p button:hover {
+.auth-section p button:hover,
+.auth-container p button:hover {
   color: var(--primary-dark);
   transform: none;
 }
+
+// Estilos para el enlace "Volver al inicio de sesión"
+  .form-links {
+    margin-top: 1.5rem;
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+      }
+    }
+  }
 
 .message {
   margin-top: 1rem;

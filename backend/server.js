@@ -6,6 +6,8 @@ const connectDB = require('./config/db');
 // Importar rutas
 const userRoutes = require('./routes/userRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 // Importar middleware de errores (lo crearemos a continuación)
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -14,14 +16,16 @@ connectDB();
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: false}));
 
 
 // Configuración de CORS
 const allowedOrigins = [
     'http://localhost:5173', // Para desarrollo local
+    'http://127.0.0.1:5173', // Para desarrollo local
     process.env.FRONTEND_URL // <-- Variable de entorno para producción
 ];
-
+ 
 app.use(cors({
     origin: function (origin, callback) {
         // Permitir solicitudes sin origen (como de herramientas como Postman o curl)
@@ -32,7 +36,9 @@ app.use(cors({
         }
         return callback(null, true);
     },
-    credentials: true // Si manejas cookies o headers de autorización
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Permite todos los métodos HTTP que vas a usar
+    credentials: true, // Si manejas cookies o headers de autorización
+    optionsSuccessStatus: 204 // Para compatibilidad con navegadores antiguos
 }));
 
 app.get('/', (req, res) => {
@@ -42,6 +48,7 @@ app.get('/', (req, res) => {
 // Usar rutas
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/auth', authRoutes); // O la ruta base que uses para auth
 
 // Middleware de manejo de errores (siempre al final, después de las rutas)
 app.use(notFound);
