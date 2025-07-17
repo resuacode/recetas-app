@@ -10,6 +10,8 @@ const authRoutes = require('./routes/authRoutes');
 
 // Importar middleware de errores (lo crearemos a continuación)
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { apiLimiter, authLimiter } = require('./middleware/rateLimitMiddleware');
+
 
 dotenv.config();
 connectDB();
@@ -44,6 +46,16 @@ app.use(cors({
 app.get('/', (req, res) => {
   res.send('API de Recetas funcionando!');
 });
+
+// Aplica el limitador general a todas las rutas de la API
+// Se recomienda aplicarlo ANTES de las rutas para que proteja todo
+app.use('/api/', apiLimiter); // Aplica a todas las rutas que empiezan con /api/
+
+// Aplica el limitador de autenticación a rutas específicas de usuario
+app.use('/api/users/register', authLimiter); // Registro
+app.use('/api/users/login', authLimiter);    // Login
+app.use('/api/users/forgot-password', authLimiter); // Olvidé contraseña
+app.use('/api/users/reset-password', authLimiter); // Restablecer contraseña
 
 // Usar rutas
 app.use('/api/users', userRoutes);
