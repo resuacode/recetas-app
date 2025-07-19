@@ -104,9 +104,20 @@ const RecipeDetail = () => {
         <div className="recipe-ingredients">
           <h3>Ingredientes:</h3>
           <ul>
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient.quantity} {ingredient.unit} de {ingredient.name}</li>
-            ))}
+            {recipe.ingredients.map((ingredient, index) => {
+              const hasQuantity = ingredient.quantity && !isNaN(ingredient.quantity);
+              const hasUnit = ingredient.unit && ingredient.unit.trim() !== '';
+              
+              if (hasQuantity && hasUnit) {
+                return <li key={index}>{ingredient.quantity} {ingredient.unit} de {ingredient.name}</li>;
+              } else if (hasQuantity && !hasUnit) {
+                return <li key={index}>{ingredient.quantity} de {ingredient.name}</li>;
+              } else if (!hasQuantity && hasUnit) {
+                return <li key={index}>{ingredient.unit} de {ingredient.name}</li>;
+              } else {
+                return <li key={index}>{ingredient.name}</li>;
+              }
+            })}
           </ul>
         </div>
       )}
