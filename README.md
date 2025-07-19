@@ -86,7 +86,7 @@ Para ejecutar el proyecto en tu máquina local, tienes dos opciones para el back
 ### Pasos Generales
 1.  **Clona el repositorio:**
     ```bash
-    git clone [https://github.com/resuacode/recetas-app.git](https://github.com/resuacode/recetas-app.git)
+    git clone https://github.com/resuacode/recetas-app.git
     cd recetas-app
     ```
 
