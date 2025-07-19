@@ -72,10 +72,17 @@ const createRecipe = asyncHandler(async (req, res) => {
   }
 
   // Asegúrate de que los ingredientes y las instrucciones tengan el formato correcto
-  // Esto es una validación básica, podrías hacerla más robusta si es necesario
+  // Validación: ingredientes deben tener al menos el nombre
   if (!Array.isArray(ingredients) || ingredients.length === 0) {
       res.status(400);
       throw new Error('Los ingredientes deben ser un array y no pueden estar vacíos');
+  }
+  
+  // Validar que cada ingrediente tenga al menos un nombre
+  const invalidIngredients = ingredients.some(ing => !ing.name || !ing.name.trim());
+  if (invalidIngredients) {
+      res.status(400);
+      throw new Error('Todos los ingredientes deben tener un nombre');
   }
   if (!Array.isArray(instructions) || instructions.length === 0) {
       res.status(400);
@@ -113,6 +120,20 @@ const updateRecipe = asyncHandler(async (req, res) => {
     // Solo el autor o un super-admin (si lo hubiera) debería poder editarla
     // Para este proyecto, simplemente verificamos que sea admin, ya que el authorize lo controla
     // Podrías añadir una verificación adicional: if (recipe.author.toString() !== req.user._id.toString()) { ... }
+
+    // Validar ingredientes si se proporcionan
+    if (ingredients) {
+      if (!Array.isArray(ingredients) || ingredients.length === 0) {
+        res.status(400);
+        throw new Error('Los ingredientes deben ser un array y no pueden estar vacíos');
+      }
+      
+      const invalidIngredients = ingredients.some(ing => !ing.name || !ing.name.trim());
+      if (invalidIngredients) {
+        res.status(400);
+        throw new Error('Todos los ingredientes deben tener un nombre');
+      }
+    }
 
     recipe.title = title || recipe.title;
     recipe.description = description || recipe.description;

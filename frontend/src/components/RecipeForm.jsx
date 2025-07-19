@@ -303,19 +303,22 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
         newErrors.categories = 'Debes añadir al menos una categoría válida.';
     }
 
-    // Validar al menos un ingrediente completo y válido
+    // Validar al menos un ingrediente con nombre válido
     const validIngredients = formData.ingredients.filter(ing =>
-        ing.name.trim() && ing.quantity > 0 && ing.unit.trim()
+        ing.name.trim()
     );
     if (validIngredients.length === 0) {
-        newErrors.ingredients = 'Debes añadir al menos un ingrediente con nombre, cantidad (mayor que 0) y unidad.';
+        newErrors.ingredients = 'Debes añadir al menos un ingrediente con nombre.';
     } else {
-        // Validar que si hay ingredientes, sus campos numéricos sean válidos
+        // Validar ingredientes individualmente
         formData.ingredients.forEach((ing, index) => {
             if (ing.name.trim() || ing.quantity || ing.unit.trim()) { // Si el ingrediente no está totalmente vacío
                 if (!ing.name.trim()) newErrors[`ingredientName-${index}`] = 'El nombre del ingrediente es obligatorio.';
-                if (ing.quantity === '' || isNaN(ing.quantity) || ing.quantity <= 0) newErrors[`ingredientQuantity-${index}`] = 'La cantidad debe ser un número positivo.';
-                if (!ing.unit.trim()) newErrors[`ingredientUnit-${index}`] = 'La unidad es obligatoria.';
+                // Solo validar cantidad si se proporciona y no está vacía
+                if (ing.quantity && ing.quantity.toString().trim() !== '' && (isNaN(ing.quantity) || parseFloat(ing.quantity) <= 0)) {
+                    newErrors[`ingredientQuantity-${index}`] = 'La cantidad debe ser un número positivo.';
+                }
+                // La unidad ya no es obligatoria
             }
         });
     }
@@ -374,7 +377,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
       imagesUrl: formData.imagesUrl.filter(url => url.trim() !== ''),
       categories: formData.categories.filter(cat => cat.trim() !== ''),
       // Filtrar ingredientes y pasos vacíos
-      ingredients: formData.ingredients.filter(ing => ing.name.trim() && ing.quantity && ing.unit.trim()),
+      ingredients: formData.ingredients.filter(ing => ing.name.trim()),
       instructions: formData.instructions.filter(inst => inst.step.trim()).map((inst, index) => ({
         step: inst.step,
         order: index + 1 // Asignar el orden automáticamente
@@ -522,8 +525,8 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
             )}
             {formErrors.imagesUrl && <p className="error-input-message">{formErrors.imagesUrl}</p>}
         </div>
-
-        {/* Video URL */}
+      {/* 
+        {/* Video URL }
         <div className="form-group">
           <label htmlFor="videoUrl">Enlace de Vídeo (TikTok/Instagram)</label>
           <input
@@ -568,7 +571,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 type="text"
                 value={ing.name}
                 onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                placeholder="Nombre (Ej: Patatas)"
+                placeholder="Nombre (Ej: Patatas) *"
                 // required={index === 0} // Primer ingrediente obligatorio
                 className={formErrors[`ingredientName-${index}`] ? 'error' : ''}
               />
@@ -577,7 +580,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 type="number"
                 value={ing.quantity}
                 onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                placeholder="Cantidad (Ej: 500)"
+                placeholder="Cantidad (Ej: 500) - Opcional"
                 // required={index === 0}
                 min="0"
                 className={formErrors[`ingredientQuantity-${index}`] ? 'error' : ''}
@@ -587,7 +590,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 type="text"
                 value={ing.unit}
                 onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                placeholder="Unidad (Ej: gramos)"
+                placeholder="Unidad (Ej: gramos) - Opcional"
                 // required={index === 0}
                 className={formErrors[`ingredientUnit-${index}`] ? 'error' : ''}
               />
