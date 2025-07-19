@@ -9,10 +9,6 @@ services:
       - ./backend:/app # Monta el código fuente local del backend en el contenedor
                        # Esto es útil para el desarrollo, cambios en el código se reflejan sin reconstruir la imagen
       - /app/node_modules # Evita que node_modules local sobrescriba node_modules del contenedor
-    #environment: # Variables de entorno para el servicio backend
-     # NODE_ENV: development
-     # MONGO_URI: mongodb://root:QPIOUGR12347109@mongodb:27017/recetasdb # Asegúrate de que este nombre coincida con el servicio de MongoDB
-     # JWT_SECRET: ${JWT_SECRET} # Toma JWT_SECRET de .env global o de la shell
     depends_on: # Asegura que MongoDB se inicie antes que el backend
       - mongodb
     env_file: # Carga variables de entorno desde el .env del backend
@@ -27,8 +23,8 @@ services:
       - mongodb_data:/data/db # Monta un volumen para persistir los datos de MongoDB
                               # ¡MUY IMPORTANTE! Sin esto, tus datos se perderían cada vez que el contenedor se detenga.
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: QPIOUGR12347109
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
 
 # Volúmenes que se usarán para la persistencia de datos
 volumes:

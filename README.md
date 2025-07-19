@@ -90,7 +90,19 @@ Para ejecutar el proyecto en tu máquina local, tienes dos opciones para el back
     cd recetas-app
     ```
 
-2.  **Configuración del Frontend:**
+2.  **Configuración de Variables de Entorno para Docker:**
+    * Copia el archivo de ejemplo de variables de entorno:
+        ```bash
+        cp .env.example .env
+        ```
+    * Edita el archivo `.env` y configura las credenciales de MongoDB:
+        ```env
+        MONGO_ROOT_USERNAME=tu_usuario_mongo
+        MONGO_ROOT_PASSWORD=tu_password_mongo_seguro
+        ```
+    * **⚠️ Importante:** El archivo `.env` no se sube al repositorio por seguridad. Cada desarrollador debe configurar su propio archivo local.
+
+3.  **Configuración del Frontend:**
     * Navega a la carpeta `frontend`:
         ```bash
         cd frontend
