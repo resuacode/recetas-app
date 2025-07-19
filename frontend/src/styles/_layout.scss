@@ -60,13 +60,32 @@
 
   .app-footer .social-links {
     display: flex;
-    flex-direction: column; /* Apila los enlaces en móviles */
-    gap: 5px;
+    flex-direction: row; /* Mantiene los iconos en fila en móviles */
+    justify-content: center;
+    align-items: center;
+    gap: 15px; /* Espacio entre iconos */
     margin-top: 10px;
   }
 
   .app-footer .social-links a {
     margin: 0; /* Elimina el margen lateral */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .app-footer .social-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .app-footer .social-links svg {
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
   }
 
     .recipe-list-container {

@@ -16,13 +16,13 @@ const Header = ({ isLoggedIn, username, userRole, onLogout }) => {
       <div className="header-right">
         {isLoggedIn ? (
           <div className="user-info">
-            <span>Logueado como: <strong>{username}</strong></span>
+            <span>¡Hola <strong>{username}</strong>!</span>
             {userRole === 'admin' && ( // Muestra el botón solo si el rol es 'admin'
               <Link to="/manage-recipes" className="manage-recipes-button">
-                Gestión Recetas
+                Mis Recetas
               </Link>
             )}
-            <button onClick={onLogout} className="logout-button">Cerrar Sesión</button>
+            <button onClick={onLogout} className="logout-button">Logout</button>
           </div>
         ) : (
           // Opcional: Puedes poner un mensaje o dejarlo vacío si no está logueado

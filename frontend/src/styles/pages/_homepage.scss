@@ -8,7 +8,7 @@
   align-items: flex-start;
 }
 
-.auth-section, .recipe-list-container, .auth-container {
+.auth-section, .auth-container {
   background-color: var(--card-background);
   padding: 2.5rem;
   border-radius: 15px;
@@ -18,7 +18,7 @@
   text-align: center;
 }
 
-.auth-section h2, .recipe-list-container h2, .auth-container h2 {
+.auth-section h2, .auth-container h2 {
   color: var(--primary-color);
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
@@ -157,7 +157,7 @@
 .recipe-list-container {
   max-width: var(--max-app-width); /* Ocupa el ancho máximo de la app */
   width: 100%; /* Asegura que ocupe el 100% del espacio disponible */
-  padding: 2.5rem; /* Mantén el padding interno */
+  padding: 1rem; /* Mantén el padding interno */
   background-color: var(--card-background);
   border-radius: 15px;
   box-shadow: var(--shadow-medium);
@@ -165,6 +165,7 @@
 }
 
 .recipe-list-container h2 {
+  color: var(--primary-color);
   text-align: center; /* Centra el título principal de la lista */
   margin-bottom: 2rem;
 }
@@ -224,11 +225,18 @@
   }
 }
 
+.recipes-per-page-group {
+  display: flex;
+  flex-direction: column;
+  flex: none; /* No crece ni se encoge */
+  min-width: auto; /* Ancho mínimo automático */
+  width: auto; /* Ancho automático basado en contenido */
+}
+
 .search-bar-group input,
 .category-input-group input,
 .author-filter-group input,
-.sort-by-group select,
-.recipes-per-page-group select {
+.sort-by-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid var(--border-color);
@@ -241,12 +249,28 @@
   }
 }
 
+.recipes-per-page-group select {
+  width: auto;
+  min-width: 80px; /* Ancho mínimo para que sea legible */
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: var(--text-color-dark);
+  background-color: var(--card-background);
+}
+
 .filters-and-sort label {
   width: 300px;
   margin-bottom: 5px;
   font-weight: bold;
   color: var(--text-color-dark);
 }
+
+.recipes-per-page-group label {
+  width: auto; /* Anula el ancho fijo para este grupo */
+}
+ 
 
 .category-chips-container {
   display: flex;

@@ -11,16 +11,16 @@ const PoliticaPrivacidad = () => {
       </p>
 
       <p>
-        Si tienes preguntas adicionales o necesitas más información sobre nuestra Política de Privacidad, no dudes en contactarnos a través de <a href="resuacode.es">resuacode.es</a>.
+        Si tienes preguntas adicionales o necesitas más información sobre nuestra Política de Privacidad, no dudes en contactarnos a través de <a href="http://resuacode.es">resuacode.es</a>.
       </p>
 
       <h2>1. Responsable del Tratamiento de Datos</h2>
       <p>
         El responsable del tratamiento de tus datos personales es:
         <br />
-        **@ResuaCode**
+        <strong>@ResuaCode</strong>
         <br />
-        **Correo electrónico de contacto:** resuadam2@gmail.com
+        <strong>Correo electrónico de contacto:</strong> resuadam2@gmail.com
       </p>
 
       <h2>2. Información que Recopilamos</h2>
@@ -29,13 +29,13 @@ const PoliticaPrivacidad = () => {
       </p>
       <ul>
         <li>
-          **Nombre de usuario (Nickname):** Para identificarte dentro de la aplicación.
+          <strong>Nombre de usuario (Nickname):</strong> Para identificarte dentro de la aplicación.
         </li>
         <li>
-          **Dirección de correo electrónico:** Para la gestión de tu cuenta, incluyendo la recuperación de contraseña.
+          <strong>Dirección de correo electrónico:</strong> Para la gestión de tu cuenta, incluyendo la recuperación de contraseña.
         </li>
         <li>
-          **Contraseña:** Almacenada de forma cifrada para proteger tu cuenta. Nunca la almacenamos en texto plano.
+          <strong>Contraseña:</strong> Almacenada de forma cifrada para proteger tu cuenta. Nunca la almacenamos en texto plano.
         </li>
       </ul>
       <p>
@@ -63,10 +63,10 @@ const PoliticaPrivacidad = () => {
       </p>
       <ul>
         <li>
-          **Consentimiento:** Al registrarte, nos das tu consentimiento explícito para el tratamiento de tu correo electrónico y nickname para los fines mencionados. Puedes retirar este consentimiento en cualquier momento eliminando tu cuenta o solicitándolo.
+          <strong>Consentimiento:</strong> Al registrarte, nos das tu consentimiento explícito para el tratamiento de tu correo electrónico y nickname para los fines mencionados. Puedes retirar este consentimiento en cualquier momento eliminando tu cuenta o solicitándolo.
         </li>
         <li>
-          **Ejecución de un Contrato:** El tratamiento de tus datos es necesario para la prestación del servicio que solicitas al crear una cuenta en Recetario.
+          <strong>Ejecución de un Contrato:</strong> El tratamiento de tus datos es necesario para la prestación del servicio que solicitas al crear una cuenta en Recetario.
         </li>
       </ul>
 
@@ -76,10 +76,10 @@ const PoliticaPrivacidad = () => {
       </p>
       <ul>
         <li>
-          **Proveedores de Alojamiento (Hosting):** Render ([https://render.com](https://render.com/)) - Para almacenar la aplicación y la base de datos. Render actúa como encargado del tratamiento de los datos almacenados en sus servidores.
+          <strong>Proveedores de Alojamiento (Hosting):</strong> Render ([https://render.com](https://render.com/)) - Para almacenar la aplicación y la base de datos. Render actúa como encargado del tratamiento de los datos almacenados en sus servidores.
         </li>
         <li>
-          **Proveedores de Servicio de Correo Electrónico:** Mailgun ([https://www.mailgun.com](https://www.mailgun.com/)) - Para el envío de correos transaccionales (ej. recuperación de contraseña). Mailgun procesa las direcciones de correo electrónico necesarias para enviar estos mensajes.
+          <strong>Proveedores de Servicio de Correo Electrónico:</strong> Mailgun ([https://www.mailgun.com](https://www.mailgun.com/)) - Para el envío de correos transaccionales (ej. recuperación de contraseña). Mailgun procesa las direcciones de correo electrónico necesarias para enviar estos mensajes.
         </li>
       </ul>
       <p>
@@ -92,28 +92,28 @@ const PoliticaPrivacidad = () => {
       </p>
       <ul>
         <li>
-          **Derecho de Acceso:** Saber si estamos tratando tus datos y acceder a ellos.
+          <strong>Derecho de Acceso:</strong> Saber si estamos tratando tus datos y acceder a ellos.
         </li>
         <li>
-          **Derecho de Rectificación:** Solicitar la corrección de tus datos si son inexactos o incompletos.
+          <strong>Derecho de Rectificación:</strong> Solicitar la corrección de tus datos si son inexactos o incompletos.
         </li>
         <li>
-          **Derecho de Supresión (Derecho al Olvido):** Solicitar la eliminación de tus datos bajo ciertas condiciones.
+          <strong>Derecho de Supresión (Derecho al Olvido):</strong> Solicitar la eliminación de tus datos bajo ciertas condiciones.
         </li>
         <li>
-          **Derecho a la Limitación del Tratamiento:** Solicitar la limitación del tratamiento de tus datos.
+          <strong>Derecho a la Limitación del Tratamiento:</strong> Solicitar la limitación del tratamiento de tus datos.
         </li>
         <li>
-          **Derecho a la Portabilidad de los Datos:** Recibir los datos que nos has proporcionado en un formato estructurado y de uso común.
+          <strong>Derecho a la Portabilidad de los Datos:</strong> Recibir los datos que nos has proporcionado en un formato estructurado y de uso común.
         </li>
         <li>
-          **Derecho de Oposición:** Oponerte al tratamiento de tus datos en determinadas circunstancias.
+          <strong>Derecho de Oposición:</strong> Oponerte al tratamiento de tus datos en determinadas circunstancias.
         </li>
         <li>
-          **Derecho a retirar el consentimiento:** En cualquier momento, si el tratamiento se basa en tu consentimiento.
+          <strong>Derecho a retirar el consentimiento:</strong> En cualquier momento, si el tratamiento se basa en tu consentimiento.
         </li>
         <li>
-          **Derecho a presentar una reclamación:** Ante la autoridad de control (en España, la Agencia Española de Protección de Datos - AEPD).
+          <strong>Derecho a presentar una reclamación:</strong> Ante la autoridad de control (en España, la Agencia Española de Protección de Datos - AEPD).
         </li>
       </ul>
       <p>
@@ -131,7 +131,7 @@ const PoliticaPrivacidad = () => {
       </p>
 
       <p>
-        **Rescetario**
+        <strong>Rescetario</strong>
       </p>
     </div>
   );
