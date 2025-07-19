@@ -9,11 +9,13 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Estado de carga
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Activar estado de carga
 
     try {
       const response = await axios.post(`${API_URL}/users/login`, {
@@ -41,6 +43,8 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error en el inicio de sesión');
       console.error('Error al iniciar sesión:', error.response?.data || error.message);
+    } finally {
+      setLoading(false); // Desactivar estado de carga al finalizar
     }
   };
 
@@ -68,7 +72,9 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
             required
           />
         </div>
-        <button type="submit">Iniciar Sesión</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+        </button>
       </form>
       <div className="form-links">
         <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>

@@ -575,7 +575,6 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 // required={index === 0} // Primer ingrediente obligatorio
                 className={formErrors[`ingredientName-${index}`] ? 'error' : ''}
               />
-            {formErrors[`ingredientName-${index}`] && <p className="error-input-message">{formErrors[`ingredientName-${index}`]}</p>}
               <input
                 type="number"
                 value={ing.quantity}
@@ -585,7 +584,6 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 min="0"
                 className={formErrors[`ingredientQuantity-${index}`] ? 'error' : ''}
               />
-            {formErrors[`ingredientQuantity-${index}`] && <p className="error-input-message">{formErrors[`ingredientQuantity-${index}`]}</p>}
               <input
                 type="text"
                 value={ing.unit}
@@ -594,10 +592,13 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 // required={index === 0}
                 className={formErrors[`ingredientUnit-${index}`] ? 'error' : ''}
               />
-            {formErrors[`ingredientUnit-${index}`] && <p className="error-input-message">{formErrors[`ingredientUnit-${index}`]}</p>}
               {formData.ingredients.length > 1 && (
                 <button type="button" onClick={() => removeIngredientField(index)} className="remove-field-button">X</button>
               )}
+              {/* Mensajes de error después de todos los inputs */}
+              {formErrors[`ingredientName-${index}`] && <p className="error-input-message">{formErrors[`ingredientName-${index}`]}</p>}
+              {formErrors[`ingredientQuantity-${index}`] && <p className="error-input-message">{formErrors[`ingredientQuantity-${index}`]}</p>}
+              {formErrors[`ingredientUnit-${index}`] && <p className="error-input-message">{formErrors[`ingredientUnit-${index}`]}</p>}
             </div>
           ))}
           <button type="button" onClick={addIngredientField} className="add-field-button">Añadir más ingredientes</button>
@@ -660,7 +661,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 {formErrors.cookTime && <p className="error-input-message">{formErrors.cookTime}</p>}
                 </div>
                 <div className="form-group-inline">
-                    <label htmlFor="servings">Número de Raciones</label>
+                    <label htmlFor="servings">Número de Raciones (cantidad)</label>
                     <input
                         type="number"
                         id="servings"

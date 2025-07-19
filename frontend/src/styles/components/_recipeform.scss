@@ -2,7 +2,7 @@
 .recipe-form-container {
   max-width: 800px;
   width: 100%;
-  padding: 2.5rem;
+  padding: 1rem;
   background-color: var(--card-background);
   border-radius: 15px;
   box-shadow: var(--shadow-medium);
@@ -51,7 +51,7 @@
 /* Campos dinámicos (imágenes, categorías, ingredientes, instrucciones) */
 .dynamic-fields-group {
   border: 1px dashed var(--border-color);
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 10px;
   margin-top: 2rem;
   background-color: #fcfcfc;
@@ -118,6 +118,52 @@
   grid-template-columns: 3fr 1.5fr 1.5fr auto; /* Nombre, Cantidad, Unidad, Botón */
   gap: 10px;
   align-items: center;
+  
+  .error-input-message {
+    grid-column: 1 / -1; /* Los mensajes de error ocupan toda la fila */
+    margin: 2px 0;
+  }
+}
+
+/* Diseño responsivo para ingredientes en móviles */
+@media (max-width: 768px) {
+  .ingredient-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto; /* Cantidad, Unidad, Botón */
+    grid-template-areas: 
+      "name name button"
+      "quantity unit button"
+      "errors errors errors";
+    gap: 10px;
+    align-items: center;
+    
+    /* Nombre del ingrediente en la primera fila */
+    input:nth-child(1) {
+      grid-area: name;
+    }
+    
+    /* Cantidad en la segunda fila, primera columna */
+    input:nth-child(2) {
+      grid-area: quantity;
+    }
+    
+    /* Unidad en la segunda fila, segunda columna */
+    input:nth-child(3) {
+      grid-area: unit;
+    }
+    
+    /* Botón de eliminar centrado verticalmente, ocupando las dos primeras filas */
+    .remove-field-button {
+      grid-area: button;
+      align-self: center;
+    }
+    
+    /* Mensajes de error en la tercera fila, ocupando todo el ancho */
+    .error-input-message {
+      grid-area: errors;
+      margin: 2px 0;
+    }
+  }
 }
 
 /* Estilos específicos para instrucciones */
