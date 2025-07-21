@@ -267,6 +267,23 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
     setFormData({ ...formData, ingredients: newIngredients.length > 0 ? newIngredients : [{ name: '', quantity: '', unit: '' }] });
   };
 
+  // Funciones para mover ingredientes hacia arriba y abajo
+  const moveIngredientUp = (index) => {
+    if (index === 0) return; // No se puede mover el primero hacia arriba
+    const newIngredients = [...formData.ingredients];
+    // Intercambiar posiciones
+    [newIngredients[index - 1], newIngredients[index]] = [newIngredients[index], newIngredients[index - 1]];
+    setFormData({ ...formData, ingredients: newIngredients });
+  };
+
+  const moveIngredientDown = (index) => {
+    if (index === formData.ingredients.length - 1) return; // No se puede mover el último hacia abajo
+    const newIngredients = [...formData.ingredients];
+    // Intercambiar posiciones
+    [newIngredients[index], newIngredients[index + 1]] = [newIngredients[index + 1], newIngredients[index]];
+    setFormData({ ...formData, ingredients: newIngredients });
+  };
+
   // Instrucciones (Pasos)
   const handleInstructionChange = (index, value) => {
     const newInstructions = [...formData.instructions];
@@ -592,6 +609,21 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 // required={index === 0}
                 className={formErrors[`ingredientUnit-${index}`] ? 'error' : ''}
               />
+              {/* Botones de reordenar */}
+              <div className="reorder-buttons">
+                {/* Botón subir: solo si no es el primero */}
+                {index > 0 && (
+                  <button type="button" onClick={() => moveIngredientUp(index)} className="move-button move-up" title="Subir ingrediente">
+                    ↑
+                  </button>
+                )}
+                {/* Botón bajar: solo si no es el último */}
+                {index < formData.ingredients.length - 1 && (
+                  <button type="button" onClick={() => moveIngredientDown(index)} className="move-button move-down" title="Bajar ingrediente">
+                    ↓
+                  </button>
+                )}
+              </div>
               {formData.ingredients.length > 1 && (
                 <button type="button" onClick={() => removeIngredientField(index)} className="remove-field-button">X</button>
               )}

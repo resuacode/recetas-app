@@ -115,7 +115,7 @@
 /* Estilos específicos para ingredientes */
 .ingredient-item {
   display: grid;
-  grid-template-columns: 3fr 1.5fr 1.5fr auto; /* Nombre, Cantidad, Unidad, Botón */
+  grid-template-columns: 3fr 1.5fr 1.5fr auto auto; /* Nombre, Cantidad, Unidad, Botones reordenar, Botón eliminar */
   gap: 10px;
   align-items: center;
   
@@ -123,17 +123,57 @@
     grid-column: 1 / -1; /* Los mensajes de error ocupan toda la fila */
     margin: 2px 0;
   }
+  
+  .reorder-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+  }
+  
+  .move-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      background: #0056b3;
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  .move-up {
+    margin-bottom: 1px;
+  }
+  
+  .move-down {
+    margin-top: 1px;
+  }
 }
 
 /* Diseño responsivo para ingredientes en móviles */
 @media (max-width: 768px) {
   .ingredient-item {
     display: grid;
-    grid-template-columns: 1fr 1fr auto; /* Cantidad, Unidad, Botón */
+    grid-template-columns: 1fr 1fr auto auto; /* Cantidad, Unidad, Botones reordenar, Botón eliminar */
     grid-template-areas: 
-      "name name button"
-      "quantity unit button"
-      "errors errors errors";
+      "name name reorder-buttons remove-button"
+      "quantity unit reorder-buttons remove-button"
+      "errors errors errors errors";
     gap: 10px;
     align-items: center;
     
@@ -152,9 +192,17 @@
       grid-area: unit;
     }
     
+    /* Botones de reordenar ocupando las dos primeras filas */
+    .reorder-buttons {
+      grid-area: reorder-buttons;
+      align-self: center;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
     /* Botón de eliminar centrado verticalmente, ocupando las dos primeras filas */
     .remove-field-button {
-      grid-area: button;
+      grid-area: remove-button;
       align-self: center;
     }
     
@@ -162,6 +210,14 @@
     .error-input-message {
       grid-area: errors;
       margin: 2px 0;
+    }
+    
+    /* Hacer los botones de mover más pequeños en móvil */
+    .move-button {
+      padding: 2px 6px;
+      font-size: 10px;
+      min-width: 20px;
+      height: 20px;
     }
   }
 }
