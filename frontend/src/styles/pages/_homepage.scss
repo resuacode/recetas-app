@@ -249,6 +249,68 @@
   }
 }
 
+/* Estilos para el dropdown de categorías */
+.category-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: var(--shadow-medium);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color-light);
+  color: var(--text-color-dark);
+  transition: background-color 0.2s ease;
+  
+  &:hover,
+  &.highlighted {
+    background-color: var(--primary-light);
+    color: var(--text-color-light);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &.no-results {
+    color: var(--placeholder-color);
+    cursor: default;
+    font-style: italic;
+    
+    &:hover {
+      background-color: transparent;
+      color: var(--placeholder-color);
+    }
+  }
+}
+
 .recipes-per-page-group select {
   width: auto;
   min-width: 80px; /* Ancho mínimo para que sea legible */

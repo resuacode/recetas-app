@@ -19,8 +19,16 @@ const RecipeList = () => {
   const [authorFilter, setAuthorFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('createdAt:desc');
 
+  // Estados para el dropdown de categorías
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [selectedDropdownIndex, setSelectedDropdownIndex] = useState(-1);
+
   // Ref para el timeout del debouncing (no se usará para el filtrado local, pero lo dejamos)
   const debounceTimeoutRef = useRef(null);
+  const categoryInputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,6 +50,20 @@ const RecipeList = () => {
       };
       const response = await axios.get(`${API_URL}/recipes`, config);
       setAllRecipes(response.data); // Guarda todas las recetas
+      
+      // Extraer todas las categorías únicas de todas las recetas
+      const categoriesSet = new Set();
+      response.data.forEach(recipe => {
+        if (recipe.categories && Array.isArray(recipe.categories)) {
+          recipe.categories.forEach(category => {
+            if (category && category.trim()) {
+              categoriesSet.add(category.trim());
+            }
+          });
+        }
+      });
+      setAllCategories(Array.from(categoriesSet).sort());
+      
       // No inicializamos displayedRecipes aquí, el useEffect de filtrado/paginación se encargará
     } catch (err) {
       console.error('Error al cargar todas las recetas:', err);
@@ -145,18 +167,87 @@ const RecipeList = () => {
   const handleSortChange = (e) => setSortOrder(e.target.value);
 
   const handleAddCategory = (e) => {
-    if (e.key === 'Enter' && categoriesInput.trim() !== '') {
-      const newCategory = categoriesInput.trim();
-      if (!selectedCategories.includes(newCategory)) {
-        setSelectedCategories([...selectedCategories, newCategory]);
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedDropdownIndex >= 0 && selectedDropdownIndex < filteredCategories.length) {
+        // Seleccionar desde dropdown con navegación por teclado
+        addCategoryToSelected(filteredCategories[selectedDropdownIndex]);
+      } else if (categoriesInput.trim() !== '') {
+        // Agregar categoría escrita manualmente
+        addCategoryToSelected(categoriesInput.trim());
       }
-      setCategoriesInput('');
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedDropdownIndex(prev => 
+        prev < filteredCategories.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedDropdownIndex(prev => 
+        prev > 0 ? prev - 1 : filteredCategories.length - 1
+      );
+    } else if (e.key === 'Escape') {
+      setShowCategoryDropdown(false);
+      setSelectedDropdownIndex(-1);
     }
+  };
+
+  // Función para añadir una categoría seleccionada
+  const addCategoryToSelected = (categoryName) => {
+    if (!selectedCategories.includes(categoryName)) {
+      setSelectedCategories([...selectedCategories, categoryName]);
+    }
+    setCategoriesInput('');
+    setShowCategoryDropdown(false);
+    setSelectedDropdownIndex(-1);
   };
 
   const handleRemoveCategory = (categoryToRemove) => {
     setSelectedCategories(selectedCategories.filter(cat => cat !== categoryToRemove));
   };
+
+  // Función para manejar el cambio en el input de categorías
+  const handleCategoryInputChange = (e) => {
+    const value = e.target.value;
+    setCategoriesInput(value);
+    setSelectedDropdownIndex(-1); // Reset navegación por teclado
+    
+    // Filtrar categorías disponibles (excluyendo las ya seleccionadas)
+    const available = allCategories.filter(cat => 
+      !selectedCategories.includes(cat) && 
+      cat.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredCategories(available);
+    setShowCategoryDropdown(value.length > 0 && available.length > 0);
+  };
+
+  // Función para manejar el focus en el input de categorías
+  const handleCategoryInputFocus = () => {
+    const available = allCategories.filter(cat => !selectedCategories.includes(cat));
+    setFilteredCategories(available);
+    setShowCategoryDropdown(available.length > 0);
+    setSelectedDropdownIndex(-1); // Reset navegación por teclado
+  };
+
+  // Función para manejar cuando se hace click fuera del dropdown
+  const handleClickOutside = (e) => {
+    if (
+      dropdownRef.current && 
+      !dropdownRef.current.contains(e.target) &&
+      categoryInputRef.current &&
+      !categoryInputRef.current.contains(e.target)
+    ) {
+      setShowCategoryDropdown(false);
+    }
+  };
+
+  // Effect para manejar clicks fuera del dropdown
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Manejador para la selección de receta (navegación real)
   const handleRecipeClick = (recipeId) => {
@@ -187,14 +278,39 @@ const RecipeList = () => {
 
           <div className="category-input-group">
             <label htmlFor="add-category">Añadir categoría:</label>
-            <input
-              id="add-category"
-              type="text"
-              placeholder="Presiona Enter para añadir"
-              value={categoriesInput}
-              onChange={(e) => setCategoriesInput(e.target.value)}
-              onKeyPress={handleAddCategory}
-            />
+            <div className="category-dropdown-container">
+              <input
+                ref={categoryInputRef}
+                id="add-category"
+                type="text"
+                placeholder="Escribe o selecciona una categoría..."
+                value={categoriesInput}
+                onChange={handleCategoryInputChange}
+                onFocus={handleCategoryInputFocus}
+                onKeyDown={handleAddCategory}
+              />
+              {showCategoryDropdown && (
+                <div ref={dropdownRef} className="category-dropdown">
+                  {filteredCategories.length > 0 ? (
+                    filteredCategories.map((category, index) => (
+                      <div
+                        key={index}
+                        className={`category-dropdown-item ${
+                          index === selectedDropdownIndex ? 'highlighted' : ''
+                        }`}
+                        onClick={() => addCategoryToSelected(category)}
+                      >
+                        {category}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="category-dropdown-item no-results">
+                      No hay categorías disponibles
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {selectedCategories.length > 0 && (
               <div className="category-chips-container">
                 {selectedCategories.map((cat, index) => (
