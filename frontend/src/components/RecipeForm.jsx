@@ -297,6 +297,36 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
   };
 
   // --- Envío del Formulario ---
+
+  // Función auxiliar para validar cantidades (números, decimales y fracciones)
+  const isValidQuantity = (quantity) => {
+    if (!quantity || quantity.trim() === '') return true; // Vacío es válido (opcional)
+    
+    const trimmed = quantity.trim();
+    
+    // Validar número decimal (ej: 1.5, 2.25, 500)
+    if (/^\d+(\.\d+)?$/.test(trimmed)) {
+      const num = parseFloat(trimmed);
+      return num > 0;
+    }
+    
+    // Validar fracción (ej: 1/2, 3/4, 5/8)
+    if (/^\d+\/\d+$/.test(trimmed)) {
+      const [numerator, denominator] = trimmed.split('/').map(Number);
+      return numerator > 0 && denominator > 0;
+    }
+    
+    // Validar número mixto (ej: 1 1/2, 2 3/4) - opcional para el futuro
+    if (/^\d+\s+\d+\/\d+$/.test(trimmed)) {
+      const parts = trimmed.split(' ');
+      const wholeNumber = parseInt(parts[0]);
+      const [numerator, denominator] = parts[1].split('/').map(Number);
+      return wholeNumber >= 0 && numerator > 0 && denominator > 0;
+    }
+    
+    return false; // Formato no válido
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null); // Limpiar errores previos globales
@@ -331,9 +361,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
         formData.ingredients.forEach((ing, index) => {
             if (ing.name.trim() || ing.quantity || ing.unit.trim()) { // Si el ingrediente no está totalmente vacío
                 if (!ing.name.trim()) newErrors[`ingredientName-${index}`] = 'El nombre del ingrediente es obligatorio.';
-                // Solo validar cantidad si se proporciona y no está vacía
-                if (ing.quantity && ing.quantity.toString().trim() !== '' && (isNaN(ing.quantity) || parseFloat(ing.quantity) <= 0)) {
-                    newErrors[`ingredientQuantity-${index}`] = 'La cantidad debe ser un número positivo.';
+                // Validar cantidad usando la nueva función que acepta fracciones y decimales
+                if (ing.quantity && ing.quantity.toString().trim() !== '' && !isValidQuantity(ing.quantity)) {
+                    newErrors[`ingredientQuantity-${index}`] = 'La cantidad debe ser un número positivo, decimal (1.5) o fracción (1/2).';
                 }
                 // La unidad ya no es obligatoria
             }
@@ -588,24 +618,23 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
                 type="text"
                 value={ing.name}
                 onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                placeholder="Nombre (Ej: Patatas) *"
+                placeholder="Nombre (Ej: Huevos, Patatas) *"
                 // required={index === 0} // Primer ingrediente obligatorio
                 className={formErrors[`ingredientName-${index}`] ? 'error' : ''}
               />
               <input
-                type="number"
+                type="text"
                 value={ing.quantity}
                 onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                placeholder="Cantidad (Ej: 500) - Opcional"
+                placeholder="Cantidad (Ej: 2, 500, 1.5, 1/2) - Opcional"
                 // required={index === 0}
-                min="0"
                 className={formErrors[`ingredientQuantity-${index}`] ? 'error' : ''}
               />
               <input
                 type="text"
                 value={ing.unit}
                 onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                placeholder="Unidad (Ej: gramos) - Opcional"
+                placeholder="Unidad (Ej: gramos, tazas) - Opcional"
                 // required={index === 0}
                 className={formErrors[`ingredientUnit-${index}`] ? 'error' : ''}
               />

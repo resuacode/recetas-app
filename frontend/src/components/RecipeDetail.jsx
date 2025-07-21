@@ -12,6 +12,42 @@ const RecipeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Función auxiliar para mostrar fracciones de forma más elegante
+  const formatQuantity = (quantity) => {
+    if (!quantity) return '';
+    
+    const str = quantity.toString().trim();
+    
+    // Reemplazar fracciones comunes con símbolos Unicode
+    const fractionMap = {
+      '1/2': '½',
+      '1/3': '⅓',
+      '2/3': '⅔',
+      '1/4': '¼',
+      '3/4': '¾',
+      '1/8': '⅛',
+      '3/8': '⅜',
+      '5/8': '⅝',
+      '7/8': '⅞',
+      '1/5': '⅕',
+      '2/5': '⅖',
+      '3/5': '⅗',
+      '4/5': '⅘',
+      '1/6': '⅙',
+      '5/6': '⅚'
+    };
+    
+    // Si es una fracción mixta (ej: "2 1/2"), separar y convertir
+    if (/^\d+\s+\d+\/\d+$/.test(str)) {
+      const [whole, fraction] = str.split(' ');
+      const unicodeFraction = fractionMap[fraction] || fraction;
+      return `${whole} ${unicodeFraction}`;
+    }
+    
+    // Si es solo una fracción simple
+    return fractionMap[str] || str;
+  };
+
   const fetchRecipeDetail = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -105,13 +141,16 @@ const RecipeDetail = () => {
           <h3>Ingredientes:</h3>
           <ul>
             {recipe.ingredients.map((ingredient, index) => {
-              const hasQuantity = ingredient.quantity && !isNaN(ingredient.quantity);
+              // Ahora quantity puede ser string (fracciones), así que validamos diferente
+              const hasQuantity = ingredient.quantity && ingredient.quantity.toString().trim() !== '';
               const hasUnit = ingredient.unit && ingredient.unit.trim() !== '';
+              const formattedQuantity = formatQuantity(ingredient.quantity);
               
               if (hasQuantity && hasUnit) {
-                return <li key={index}>{ingredient.quantity} {ingredient.unit} de {ingredient.name}</li>;
+                return <li key={index}>{formattedQuantity} {ingredient.unit} de {ingredient.name}</li>;
               } else if (hasQuantity && !hasUnit) {
-                return <li key={index}>{ingredient.quantity} de {ingredient.name}</li>;
+                // Si solo hay cantidad y nombre (sin unidad), no mostrar "de"
+                return <li key={index}>{formattedQuantity} {ingredient.name}</li>;
               } else if (!hasQuantity && hasUnit) {
                 return <li key={index}>{ingredient.unit} de {ingredient.name}</li>;
               } else {

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const ingredientSchema = mongoose.Schema({
   name: { type: String, required: true },
-  quantity: { type: Number }, // Puede ser opcional
+  quantity: { type: String }, // Puede ser opcional - acepta números, decimales y fracciones como texto
   unit: { type: String }, // ej: "gramos", "ml", "cucharadas", "tazas", puede ser opcional
 });
 
