@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importa Router, Routes, Route, Navigate
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -14,6 +15,7 @@ import RecipeList from './components/RecipeList';
 import RecipeDetail from './components/RecipeDetail'; 
 import RecipeManagement from './components/RecipeManagement';
 import RecipeForm from './components/RecipeForm';
+import { setupAxiosInterceptors, checkSession, clearAuthData } from './utils/auth';
 import './App.scss'; // Asegúrate de tener este archivo para los estilos
 
 function App() {
@@ -21,35 +23,52 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [showRegister, setShowRegister] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Nuevo estado para carga inicial
 
   // console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser); // Puedes quitar este log ahora si quieres
 
+  // Función para manejar logout (definida primero)
+  const handleLogout = () => {
+    console.log('Cerrando sesión.');
+    clearAuthData();
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setUserRole(null);
+    window.location.href = '/'; // Recarga la página y va a la raíz
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userString = localStorage.getItem('user');
-    const roleString = localStorage.getItem('role');
+    // Configurar interceptores de Axios
+    setupAxiosInterceptors(handleLogout);
 
-    if (token && userString && roleString) {
+    // Validar sesión al cargar la aplicación
+    const validateSession = async () => {
+      setIsLoadingAuth(true);
       try {
-        const parsedUser = JSON.parse(userString);
-        const parsedRole = JSON.parse(roleString);
-        // console.log('Usuario parseado de localStorage:', parsedUser); // Puedes quitar este log
-        setCurrentUser(parsedUser);
-        setIsLoggedIn(true);
-        setUserRole(parsedRole);
-      } catch (e) {
-        console.error("Error al parsear el JSON del usuario desde localStorage:", e);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
-        setIsLoggedIn(false);
-        setCurrentUser(null);
-        setUserRole(null);
+        const sessionData = await checkSession();
+        
+        if (sessionData.isValid) {
+          setCurrentUser(sessionData.user);
+          setIsLoggedIn(true);
+          setUserRole(sessionData.role);
+        } else {
+          // Sesión inválida - limpiar y mostrar mensaje si había datos previos
+          const hadToken = localStorage.getItem('token');
+          if (hadToken) {
+            toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+          }
+          handleLogout();
+        }
+      } catch (error) {
+        console.error('Error during session validation:', error);
+        handleLogout();
+      } finally {
+        setIsLoadingAuth(false);
       }
-    }
-  }, []);
+    };
 
-  const handleLoginSuccess = (token, user, role) => {
+    validateSession();
+  }, []);  const handleLoginSuccess = (token, user, role) => {
     // console.log('handleLoginSuccess llamado. Usuario recibido:', user); // Puedes quitar este log
     setIsLoggedIn(true);
     setCurrentUser(user);
@@ -60,16 +79,17 @@ function App() {
     localStorage.setItem('role', JSON.stringify(role)); // Guarda el rol del usuario
   };
 
-  const handleLogout = () => {
-    console.log('Cerrando sesión.');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role'); // Elimina el rol del usuario
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setUserRole(null);
-    window.location.href = '/'; // Recarga la página y va a la raíz
-  };
+  // Mostrar pantalla de carga mientras se valida la sesión
+  if (isLoadingAuth) {
+    return (
+      <div className="app-loading-container">
+        <div className="loading-spinner">
+          <h2>Verificando sesión...</h2>
+          <div className="spinner"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
      <Router>

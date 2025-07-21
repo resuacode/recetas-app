@@ -1,4 +1,3 @@
-// frontend/src/components/RecipeList.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -42,13 +41,7 @@ const RecipeList = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const response = await axios.get(`${API_URL}/recipes`, config);
+      const response = await axios.get(`${API_URL}/recipes`);
       setAllRecipes(response.data); // Guarda todas las recetas
       
       // Extraer todas las categorías únicas de todas las recetas

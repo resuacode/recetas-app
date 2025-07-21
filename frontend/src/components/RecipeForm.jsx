@@ -98,13 +98,7 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
     setLoadingForm(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const response = await axios.get(`${API_URL}/recipes/${id}`, config);
+      const response = await axios.get(`${API_URL}/recipes/${id}`);
       const recipeData = response.data;
 
       // Mapear los datos de la receta para el estado del formulario
@@ -459,11 +453,9 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
     }
 
     try {
-      const token = localStorage.getItem('token');
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
       };
 

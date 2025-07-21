@@ -52,13 +52,7 @@ const RecipeDetail = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const response = await axios.get(`${API_URL}/recipes/${id}`, config);
+      const response = await axios.get(`${API_URL}/recipes/${id}`);
       setRecipe(response.data);
     } catch (err) {
       console.error('Error al cargar detalle de la receta:', err);

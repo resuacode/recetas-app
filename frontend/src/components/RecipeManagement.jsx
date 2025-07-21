@@ -18,11 +18,7 @@ const RecipeManagement = ({ currentUser }) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         params: {
           sortBy: 'createdAt:desc', // Por defecto, las más recientes primero
         },
@@ -57,13 +53,7 @@ const RecipeManagement = ({ currentUser }) => {
   const handleDeleteRecipe = async (recipeId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta receta?')) {
       try {
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        await axios.delete(`${API_URL}/recipes/${recipeId}`, config);
+        await axios.delete(`${API_URL}/recipes/${recipeId}`);
         // Actualizar la lista después de eliminar
         setUserRecipes(userRecipes.filter(recipe => recipe._id !== recipeId));
         toast.success('Receta eliminada correctamente.');

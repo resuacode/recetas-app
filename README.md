@@ -33,6 +33,17 @@ Este proyecto se construye con una arquitectura **MERN Stack** (MongoDB, Express
 * **Mailgun**: Servicio de envío de correos electrónicos transaccionales (utilizado para la recuperación de contraseña).
 * **Docker**: Herramienta de contenerización para empaquetar el backend y sus dependencias, asegurando un entorno de ejecución consistente.
 
+### Servicios Externos
+* **Cloudinary**: Servicio de gestión y optimización de imágenes en la nube, utilizado para el almacenamiento y procesamiento de imágenes de recetas.
+* **Mailgun**: Plataforma de envío de correos electrónicos transaccionales para funcionalidades de recuperación de contraseña.
+
+### Arquitectura y Patrones
+* **Arquitectura RESTful**: API bien estructurada siguiendo principios REST para operaciones CRUD.
+* **Interceptores de Axios**: Centralización del manejo de autenticación y manejo de errores HTTP.
+* **Validación en ambos extremos**: Validación tanto en frontend (UX inmediata) como en backend (seguridad).
+* **Gestión de estado local**: Uso eficiente del estado de React para una experiencia de usuario fluida.
+* **Responsive Design**: Diseño adaptativo con SCSS y CSS Grid para óptima experiencia en móviles y escritorio.
+
 ---
 
 ## 💡 Funcionalidades
@@ -44,19 +55,39 @@ Este proyecto se construye con una arquitectura **MERN Stack** (MongoDB, Express
 * **Navegación y Consulta de Recetas**:
     * **Ver todas las recetas**: Explora un listado completo de recetas disponibles para todos los usuarios.
     * **Ver detalle de receta**: Accede a la información detallada de cada receta (ingredientes, instrucciones, tiempos, etc.).
+    * **Búsqueda y Filtrado Avanzado**:
+        - **Búsqueda por título**: Encuentra recetas por nombre o palabras clave.
+        - **Filtro por categorías**: Dropdown con autocompletado para seleccionar múltiples categorías.
+        - **Filtro por autor**: Busca recetas de usuarios específicos.
+        - **Ordenación flexible**: Por fecha de creación, título, autor, etc. (ascendente/descendente).
+        - **Paginación configurable**: 10, 20 o 50 recetas por página.
+    * **Ingredientes con formato avanzado**: Visualización inteligente de cantidades en formato de fracciones, decimales y números mixtos.
 
 ### Funcionalidades de Administración (Rol 'admin')
 * **Gestión de Mis Recetas**: Los usuarios con rol `admin` pueden acceder a una sección exclusiva para gestionar **únicamente las recetas que ellos mismos han subido**.
-    * **Crear Nueva Receta**: Añade nuevas recetas a la plataforma.
+    * **Crear Nueva Receta**: Añade nuevas recetas a la plataforma con las siguientes características:
+        - **Subida de imágenes**: Integración con Cloudinary para almacenamiento de imágenes optimizado.
+        - **Ingredientes flexibles**: Cantidades opcionales que admiten números decimales (1.5), fracciones (1/2) y números mixtos (1 1/2).
+        - **Reordenación de ingredientes**: Mover ingredientes hacia arriba o abajo en la lista.
+        - **Diseño responsive**: Formulario optimizado para dispositivos móviles con layout de dos filas para ingredientes.
+        - **Validación robusta**: Validación en tiempo real de formatos de cantidad y campos obligatorios.
     * **Editar Receta**: Modifica los detalles de tus propias recetas existentes.
     * **Eliminar Receta**: Borra tus propias recetas de la base de datos.
 * **Seguridad de Acceso**: La API asegura que solo el autor de una receta (o un super-administrador, si se implementara) pueda modificarla o eliminarla.
+
+### Autenticación y Gestión de Sesiones
+* **Gestión automática de tokens**: Sistema centralizado con interceptores de Axios para manejo transparente de autenticación.
+* **Validación de sesión**: Detección automática de tokens expirados al cargar la aplicación.
+* **Renovación de tokens**: Endpoint de refresh para mantener sesiones activas sin interrupciones.
+* **Redirección automática**: Redirige automáticamente al login cuando la sesión expira, con notificaciones informativas.
+* **Experiencia de usuario mejorada**: Eliminación de errores sorpresa y logout manual innecesario.
 
 ### Seguridad y Rendimiento
 * **Rate Limiting**: Protección contra ataques de fuerza bruta en endpoints de autenticación y de API generales.
 * **Compresión de Respuestas**: Las respuestas del servidor están comprimidas (Gzip/Brotli) para reducir el consumo de ancho de banda y mejorar la velocidad de carga.
 * **Indexación de Base de Datos**: Índices aplicados en MongoDB para optimizar las consultas de búsqueda y filtrado.
 * **Política de Privacidad**: Documento accesible desde el formulario de registro y con una ruta dedicada, detallando el tratamiento de datos personales conforme al RGPD.
+* **Filtrado en cliente**: Mejora del rendimiento al procesar filtros y ordenación en el frontend, reduciendo la carga del servidor.
 
 ---
 
@@ -166,5 +197,36 @@ Para ejecutar el proyecto en tu máquina local, tienes dos opciones para el back
     docker run -p 5000:5000 --env-file ./.env recetario-backend
     ```
     El backend debería estar corriendo en `http://localhost:5000` dentro del contenedor.
+
+### Opción 3: Ejecutar con Docker Compose (Recomendado para Desarrollo)
+* Desde la raíz del proyecto, donde está el archivo `docker-compose.yml`:
+    ```bash
+    docker-compose up -d
+    ```
+    Esto iniciará tanto MongoDB como el backend en contenedores separados, con la base de datos persistente en un volumen Docker.
+
+---
+
+## 🔧 Mejoras y Desarrollo Reciente
+
+### Funcionalidades Implementadas Recientemente
+* **Sistema de autenticación robusto**: Implementación de interceptores automáticos para manejo de tokens JWT, eliminando la necesidad de configuración manual en cada petición HTTP.
+* **Gestión inteligente de ingredientes**: Soporte para cantidades en formato de fracciones, decimales y números mixtos, con validación automática.
+* **Interfaz móvil mejorada**: Layout optimizado para ingredientes en dispositivos móviles con disposición de dos filas (nombre en primera fila, cantidad y unidad en segunda).
+* **Sistema de filtrado avanzado**: Dropdown de categorías con autocompletado, búsqueda por título y autor, con procesamiento en cliente para mejor rendimiento.
+* **Reordenación de ingredientes**: Funcionalidad para mover ingredientes hacia arriba y abajo en formularios de recetas.
+* **Integración con Cloudinary**: Subida optimizada de imágenes con validación de formato y tamaño.
+
+### Arquitectura de Desarrollo
+* **Gestión centralizada de autenticación**: Archivo `utils/auth.js` con interceptores de Axios para manejo automático de tokens y redirecciones.
+* **Validación robusta**: Sistema de validación tanto en frontend como backend, con mensajes de error específicos y UX mejorada.
+* **Código mantenible**: Eliminación de código duplicado para manejo de autenticación en componentes individuales.
+* **Responsive design**: Uso de SCSS modular con mixins y variables para diseño adaptativo consistente.
+
+### Flujo de Autenticación Mejorado
+1. **Validación automática**: Al cargar la aplicación, se valida automáticamente la sesión del usuario.
+2. **Manejo transparente**: Las peticiones HTTP incluyen automáticamente los headers de autenticación.
+3. **Renovación inteligente**: Sistema preparado para renovación automática de tokens antes de que expiren.
+4. **UX sin interrupciones**: Los usuarios son notificados y redirigidos suavemente cuando la sesión expira.
 
 ---
