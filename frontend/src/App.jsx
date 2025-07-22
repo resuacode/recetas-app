@@ -34,7 +34,8 @@ function App() {
     setIsLoggedIn(false);
     setCurrentUser(null);
     setUserRole(null);
-    window.location.href = '/'; // Recarga la página y va a la raíz
+    setIsLoadingAuth(false); // Asegurar que no se quede en loading
+    // No hacer window.location.href, dejar que React Router maneje la navegación
   };
 
   useEffect(() => {
@@ -52,23 +53,33 @@ function App() {
           setIsLoggedIn(true);
           setUserRole(sessionData.role);
         } else {
-          // Sesión inválida - limpiar y mostrar mensaje si había datos previos
+          // Sesión inválida - limpiar estado
+          setIsLoggedIn(false);
+          setCurrentUser(null);
+          setUserRole(null);
+          
+          // Solo mostrar mensaje si había datos previos (no en carga inicial)
           const hadToken = localStorage.getItem('token');
           if (hadToken) {
-            toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            console.log('Previous session found but invalid, clearing...');
           }
-          handleLogout();
+          clearAuthData();
         }
       } catch (error) {
         console.error('Error during session validation:', error);
-        handleLogout();
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setUserRole(null);
+        clearAuthData();
       } finally {
         setIsLoadingAuth(false);
       }
     };
 
     validateSession();
-  }, []);  const handleLoginSuccess = (token, user, role) => {
+  }, []); // Sin dependencias para evitar re-renders innecesarios
+
+  const handleLoginSuccess = (token, user, role) => {
     // console.log('handleLoginSuccess llamado. Usuario recibido:', user); // Puedes quitar este log
     setIsLoggedIn(true);
     setCurrentUser(user);
@@ -151,6 +162,20 @@ function App() {
                   </div>
                 ) : (
                   <RecipeList /> // Si está logueado, muestra RecipeList
+                )
+              }
+            />
+            {/* Ruta específica para login (por si se necesita redirección) */}
+            <Route
+              path="/login"
+              element={
+                !isLoggedIn ? (
+                  <div className="auth-section">
+                    <Login onLoginSuccess={handleLoginSuccess} />
+                    <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
+                  </div>
+                ) : (
+                  <Navigate to="/" replace />
                 )
               }
             />

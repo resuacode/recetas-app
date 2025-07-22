@@ -4,6 +4,9 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Variable para evitar múltiples validaciones simultáneas
+let isValidating = false;
+
 // Función para validar si un token es válido haciendo una petición al backend
 export const validateToken = async (token) => {
   if (!token) {
@@ -15,10 +18,11 @@ export const validateToken = async (token) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      timeout: 10000, // 10 segundos de timeout
     });
     return response.status === 200;
   } catch (error) {
-    console.log('Token validation failed:', error.response?.status);
+    console.log('Token validation failed:', error.response?.status || error.message);
     return false;
   }
 };
@@ -59,11 +63,19 @@ export const setupAxiosInterceptors = (logout) => {
     (error) => {
       if (error.response?.status === 401) {
         console.log('Token expired or invalid, logging out...');
-        toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        clearAuthData();
-        logout(); // Función que viene del contexto de la app
-        // Redirigir al login se manejará en el componente App
-        window.location.href = '/login';
+        
+        // Evitar múltiples toast si ya se está procesando el logout
+        if (!window.isLoggingOut) {
+          window.isLoggingOut = true;
+          toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+          clearAuthData();
+          logout(); // Función que viene del contexto de la app
+          
+          // Reset flag después de un tiempo
+          setTimeout(() => {
+            window.isLoggingOut = false;
+          }, 1000);
+        }
       }
       return Promise.reject(error);
     }
@@ -72,38 +84,57 @@ export const setupAxiosInterceptors = (logout) => {
 
 // Función para verificar la sesión al cargar la aplicación
 export const checkSession = async () => {
-  const token = getToken();
-  const userString = localStorage.getItem('user');
-  const roleString = localStorage.getItem('role');
-
-  if (!token || !userString || !roleString) {
-    clearAuthData();
+  // Evitar múltiples validaciones simultáneas
+  if (isValidating) {
+    console.log('Session validation already in progress, skipping...');
     return { isValid: false };
   }
 
+  isValidating = true;
+  
+  // Timeout de seguridad para resetear isValidating en caso de error
+  const timeoutId = setTimeout(() => {
+    console.log('Session validation timeout, resetting flag...');
+    isValidating = false;
+  }, 15000); // 15 segundos
+  
   try {
-    // Validar que el JSON esté bien formado
-    const parsedUser = JSON.parse(userString);
-    const parsedRole = JSON.parse(roleString);
+    const token = getToken();
+    const userString = localStorage.getItem('user');
+    const roleString = localStorage.getItem('role');
 
-    // Validar el token con el backend
-    const isTokenValid = await validateToken(token);
-    
-    if (isTokenValid) {
-      return {
-        isValid: true,
-        user: parsedUser,
-        role: parsedRole,
-        token: token
-      };
-    } else {
+    if (!token || !userString || !roleString) {
       clearAuthData();
       return { isValid: false };
     }
-  } catch (error) {
-    console.error('Error validating session:', error);
-    clearAuthData();
-    return { isValid: false };
+
+    try {
+      // Validar que el JSON esté bien formado
+      const parsedUser = JSON.parse(userString);
+      const parsedRole = JSON.parse(roleString);
+
+      // Validar el token con el backend
+      const isTokenValid = await validateToken(token);
+      
+      if (isTokenValid) {
+        return {
+          isValid: true,
+          user: parsedUser,
+          role: parsedRole,
+          token: token
+        };
+      } else {
+        clearAuthData();
+        return { isValid: false };
+      }
+    } catch (error) {
+      console.error('Error validating session:', error);
+      clearAuthData();
+      return { isValid: false };
+    }
+  } finally {
+    clearTimeout(timeoutId);
+    isValidating = false;
   }
 };
 
