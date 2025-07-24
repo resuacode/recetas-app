@@ -69,6 +69,63 @@ const RecipeManagement = ({ currentUser }) => {
     navigate(`/recipes/${recipeId}`);
   };
 
+  // Función para calcular las categorías más populares
+  const getTopCategories = (recipes, limit = 3) => {
+    const categoryCount = {};
+    
+    // Contar las categorías de todas las recetas
+    recipes.forEach(recipe => {
+      if (recipe.categories && Array.isArray(recipe.categories)) {
+        recipe.categories.forEach(category => {
+          if (category && category.trim()) {
+            const normalizedCategory = category.trim();
+            categoryCount[normalizedCategory] = (categoryCount[normalizedCategory] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    // Convertir a array y ordenar por frecuencia
+    const sortedCategories = Object.entries(categoryCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, limit);
+
+    return sortedCategories;
+  };
+
+  // Función para obtener información de la primera receta
+  const getFirstRecipeInfo = (recipes) => {
+    if (recipes.length === 0) return null;
+    
+    // Ordenar por fecha de creación (más antigua primero)
+    const sortedByDate = recipes
+      .filter(recipe => recipe.createdAt) // Asegurar que tenga fecha
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    if (sortedByDate.length === 0) return null;
+    
+    const firstRecipe = sortedByDate[0];
+    const createdDate = new Date(firstRecipe.createdAt);
+    
+    // Formatear la fecha de manera legible
+    const formattedDate = createdDate.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    return {
+      date: formattedDate,
+      title: firstRecipe.title,
+      id: firstRecipe._id
+    };
+  };
+
+  // Calcular estadísticas
+  const totalRecipes = userRecipes.length;
+  const topCategories = getTopCategories(userRecipes);
+  const firstRecipeInfo = getFirstRecipeInfo(userRecipes);
+
   if (!currentUser) return <p>Acceso denegado. No se ha encontrado el usuario.</p>;
   if (loading) return <p className="loading-message">Cargando tus recetas...</p>;
   if (error) return <p className="error-message">{error}</p>;
@@ -96,6 +153,55 @@ const RecipeManagement = ({ currentUser }) => {
           ))
         )}
       </div>
+
+      {/* Sección de estadísticas - solo se muestra si hay recetas */}
+      {userRecipes.length > 0 && (
+        <div className="user-stats-section">
+          <h3>📊 Resumen de tus Contribuciones</h3>
+          
+          <div className="stats-container">
+            <div className="stat-item total-recipes">
+              <div className="stat-number">{totalRecipes}</div>
+              <div className="stat-label">
+                {totalRecipes === 1 ? 'Receta Creada' : 'Recetas Creadas'}
+              </div>
+            </div>
+
+            <div className="stat-item top-categories">
+              <div className="stat-label">Tus Categorías Favoritas:</div>
+              <div className="categories-list">
+                {topCategories.length > 0 ? (
+                  topCategories.map(([category, count], index) => (
+                    <div key={category} className="category-stat">
+                      <span className="category-rank">#{index + 1}</span>
+                      <span className="category-name">{category}</span>
+                      <span className="category-count">({count} {count === 1 ? 'receta' : 'recetas'})</span>
+                    </div>
+                  ))
+                ) : (
+                  <span className="no-categories">No hay categorías disponibles</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Información de la primera receta */}
+          {firstRecipeInfo && (
+            <div className="first-recipe-info">
+              <p className="contributing-since">
+                🎂 Contribuyendo desde <strong>{firstRecipeInfo.date}</strong> con{' '}
+                <span 
+                  className="first-recipe-link"
+                  onClick={() => navigate(`/recipes/${firstRecipeInfo.id}`)}
+                  title="Ver receta"
+                >
+                  "{firstRecipeInfo.title}"
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,13 @@
 // frontend/src/components/Header.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Header = ({ isLoggedIn, username, userRole, onLogout }) => {
+  const location = useLocation();
+  
+  // Verificar si estamos en alguna página de manage-recipes
+  const isInManageRecipes = location.pathname.startsWith('/manage-recipes');
+
   return (
     <header className="app-header">
       <div className="header-left">
@@ -16,10 +21,13 @@ const Header = ({ isLoggedIn, username, userRole, onLogout }) => {
       <div className="header-right">
         {isLoggedIn ? (
           <div className="user-info">
-            <span>¡Hola <strong>{username}</strong>!</span>
+            <span>¡Hola, <strong>{username}</strong>!</span>
             {userRole === 'admin' && ( // Muestra el botón solo si el rol es 'admin'
-              <Link to="/manage-recipes" className="manage-recipes-button">
-                Mis Recetas
+              <Link 
+                to={isInManageRecipes ? "/" : "/manage-recipes"} 
+                className="manage-recipes-button"
+              >
+                {isInManageRecipes ? "Inicio" : "Mis Recetas"}
               </Link>
             )}
             <button onClick={onLogout} className="logout-button">Logout</button>

@@ -2,6 +2,7 @@
 :root {
   /* Colores primarios */
   --primary-color: #4CAF50; /* Verde vibrante */
+  --primary-color-rgb: 76, 175, 80; /* RGB del color primario para transparencias */
   --primary-dark: #388e3c;  /* Verde más oscuro para hover */
   --primary-light: #66bb6a; /* Verde más claro */
 
@@ -10,8 +11,10 @@
   --accent-dark: #1976D2;   /* Azul más oscuro para hover */
 
   /* Colores neutros/texto */
+  --text-color: #333;          /* Texto principal */
   --text-color-dark: #333;     /* Texto principal oscuro */
   --text-color-light: #f4f7f6; /* Fondo claro/texto claro */
+  --text-muted: #666;          /* Texto secundario/muted */
   --background-color: #f4f7f6; /* Fondo general de la app */
   --card-background: #ffffff;  /* Fondo de tarjetas y formularios */
   --border-color: #ddd;        /* Color de bordes */

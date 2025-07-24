@@ -117,3 +117,188 @@
   background-color: var(--error-dark);
   transform: translateY(-1px);
 }
+
+/* Estilos para la sección de estadísticas */
+.user-stats-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(var(--primary-color-rgb), 0.05) 100%);
+  border-radius: 15px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-light);
+}
+
+.user-stats-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.total-recipes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--accent-color);
+  color: var(--text-color-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.top-categories .stat-label {
+  color: var(--text-color);
+  text-align: left;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.category-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.category-stat:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.category-rank {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.category-name {
+  flex-grow: 1;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.category-count {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.no-categories {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Estilos para la información de la primera receta */
+.first-recipe-info {
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background-color: rgba(var(--primary-color-rgb), 0.08);
+  border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.contributing-since {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.contributing-since strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.first-recipe-link {
+  color: var(--accent-color);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+  display: inline;
+}
+
+.first-recipe-link:hover {
+  color: var(--accent-dark);
+  border-bottom-color: var(--accent-dark);
+  text-decoration: none;
+}
+
+/* Responsive para estadísticas */
+@media (max-width: 768px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+  }
+  
+  .user-stats-section {
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .first-recipe-info {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .contributing-since {
+    font-size: 0.9rem;
+  }
+}
