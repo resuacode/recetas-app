@@ -1,9 +1,24 @@
 // frontend/src/components/RecipeCard.jsx
 import React from 'react';
+import FavoriteButton from './FavoriteButton';
 
-const RecipeCard = ({ recipe, onClick }) => {
+const RecipeCard = ({ recipe, onClick, isLoggedIn, onFavoriteChange }) => {
+  const handleCardClick = (e) => {
+    // Evitar que se active el onClick si se hace clic en el botón de favoritos
+    if (e.target.closest('.favorite-button')) {
+      return;
+    }
+    onClick(recipe._id);
+  };
+
   return (
-    <div className="recipe-card" onClick={() => onClick(recipe._id)}>
+    <div className="recipe-card" onClick={handleCardClick}>
+      <FavoriteButton 
+        recipeId={recipe._id} 
+        isLoggedIn={isLoggedIn} 
+        size="medium"
+        onFavoriteChange={onFavoriteChange}
+      />
       <h3>{recipe.title}</h3>
       <p>{recipe.description}</p>
       {/* Opcional: Mostrar categorías y autor */}

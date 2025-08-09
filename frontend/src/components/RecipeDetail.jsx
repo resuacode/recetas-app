@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Importa useParams y useNavigate
 import axios from 'axios';
+import FavoriteButton from './FavoriteButton';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const RecipeDetail = () => {
+const RecipeDetail = ({ currentUser, isLoggedIn }) => {
   const { id } = useParams(); // Obtiene el ID de la URL
   const navigate = useNavigate(); // Para volver a la lista si es necesario
   const [recipe, setRecipe] = useState(null);
@@ -96,7 +97,15 @@ const RecipeDetail = () => {
 
   return (
     <div className="recipe-detail-container">
-      <h2>{recipe.title}</h2>
+      <div className="recipe-header">
+        <h2>{recipe.title}</h2>
+        <FavoriteButton 
+          recipeId={recipe._id} 
+          isLoggedIn={isLoggedIn} 
+          size="large"
+          onFavoriteChange={() => {}} // Callback vacío para RecipeDetail
+        />
+      </div>
       <p className="recipe-description">{recipe.description}</p>
 
       {/* Mostrar "basado en" solo si existe y no está vacío/nulo */}

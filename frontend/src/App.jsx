@@ -145,25 +145,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={
-                !isLoggedIn ? (
-                  <div className="auth-section">
-                    {showRegister ? (
-                      <>
-                        <Register />
-                        <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
-                      </>
-                    ) : (
-                      <>
-                        <Login onLoginSuccess={handleLoginSuccess} />
-                        <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <RecipeList /> // Si está logueado, muestra RecipeList
-                )
-              }
+              element={<RecipeList currentUser={currentUser} isLoggedIn={isLoggedIn} />}
             />
             {/* Ruta específica para login (por si se necesita redirección) */}
             <Route
@@ -179,6 +161,20 @@ function App() {
                 )
               }
             />
+            {/* Ruta específica para registro */}
+            <Route
+              path="/register"
+              element={
+                !isLoggedIn ? (
+                  <div className="auth-section">
+                    <Register />
+                    <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
+                  </div>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
             {/* Ruta para la política de privacidad */}
             <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} /> 
             {/* La ruta para el formulario de olvidó la contraseña */}
@@ -188,7 +184,7 @@ function App() {
             {/* Ruta para la vista de detalle de la receta */}
             <Route
               path="/recipes/:id"
-              element={isLoggedIn ? <RecipeDetail /> : <Navigate to="/" replace />}
+              element={<RecipeDetail currentUser={currentUser} isLoggedIn={isLoggedIn} />}
             />
              {/* Ruta para Gestión de Recetas */}
             <Route

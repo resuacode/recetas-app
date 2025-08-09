@@ -33,8 +33,10 @@ const Header = ({ isLoggedIn, username, userRole, onLogout }) => {
             <button onClick={onLogout} className="logout-button">Logout</button>
           </div>
         ) : (
-          // Opcional: Puedes poner un mensaje o dejarlo vacío si no está logueado
-          <span></span>
+          <div className="auth-buttons">
+            <Link to="/login" className="login-link">Iniciar Sesión</Link>
+            <Link to="/register" className="register-link">Registrarse</Link>
+          </div>
         )}
       </div>
     </header>

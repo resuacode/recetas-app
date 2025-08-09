@@ -1,0 +1,119 @@
+/* Estilos para el botón de favoritos */
+.favorite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3.6px; /* Reducido de 4px para ser consistente con medium */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.favorite-button.loading {
+  cursor: not-allowed;
+}
+
+.favorite-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Tamaños del botón */
+.favorite-button.small {
+  padding: 1.8px; /* Reducido de 2px */
+}
+
+.favorite-button.small .heart-icon {
+  font-size: 0.9rem; /* Reducido de 1rem */
+}
+
+.favorite-button.medium {
+  padding: 3.6px; /* Reducido de 4px */
+}
+
+.favorite-button.medium .heart-icon {
+  font-size: 1.08rem; /* Reducido de 1.2rem */
+}
+
+.favorite-button.large {
+  padding: 5.4px; /* Reducido de 6px */
+}
+
+.favorite-button.large .heart-icon {
+  font-size: 1.35rem; /* Reducido de 1.5rem */
+}
+
+/* Estados del corazón */
+.favorite-button.favorited .heart-icon {
+  animation: heartBeat 0.6s ease-in-out;
+}
+
+.favorite-button.not-favorited:hover .heart-icon {
+  transform: scale(1.1);
+}
+
+.favorite-button.not-logged {
+  opacity: 0.6;
+}
+
+.favorite-button.not-logged:hover {
+  opacity: 0.8;
+}
+
+/* Animación del corazón cuando se añade a favoritos */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Estilos para cuando está en las tarjetas de recetas */
+.recipe-card .favorite-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  opacity: 1; /* Siempre visible */
+  visibility: visible; /* Siempre visible */
+}
+
+.recipe-card .favorite-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+/* Estilos para cuando está en el detalle de receta */
+.recipe-detail .favorite-button {
+  background-color: var(--card-background);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-light);
+}
+
+.recipe-detail .favorite-button:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Evitar que los botones de favoritos aparezcan en lugares incorrectos */
+.app-header .favorite-button,
+header .favorite-button {
+  display: none !important;
+}

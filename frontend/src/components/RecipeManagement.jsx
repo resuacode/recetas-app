@@ -449,7 +449,12 @@ const RecipeManagement = ({ currentUser }) => {
         ) : (
           displayedRecipes.map((recipe) => (
             <div key={recipe._id} className="management-recipe-item">
-              <RecipeCard recipe={recipe} onClick={handleRecipeClick} />
+              <RecipeCard 
+                recipe={recipe} 
+                onClick={handleRecipeClick} 
+                isLoggedIn={true}
+                onFavoriteChange={() => {}} // Callback vacío para RecipeManagement
+              />
               <div className="management-buttons">
                 <button onClick={() => handleEditRecipe(recipe._id)} className="edit-button">Editar</button>
                 <button onClick={() => handleDeleteRecipe(recipe._id)} className="delete-button">Borrar</button>

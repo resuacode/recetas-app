@@ -5,9 +5,10 @@ import RecipeCard from './RecipeCard';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const RecipeList = () => {
+const RecipeList = ({ currentUser, isLoggedIn }) => {
   const [allRecipes, setAllRecipes] = useState([]); // Almacena todas las recetas del backend
   const [displayedRecipes, setDisplayedRecipes] = useState([]); // Las recetas que se muestran en la página actual (después de filtros, orden y paginación)
+  const [userFavorites, setUserFavorites] = useState([]); // IDs de recetas favoritas del usuario
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,6 +18,7 @@ const RecipeList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [authorFilter, setAuthorFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('createdAt:desc');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   // Estados para el dropdown de categorías
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -66,23 +68,53 @@ const RecipeList = () => {
     }
   }, []);
 
+  // Función para obtener los favoritos del usuario
+  const fetchUserFavorites = useCallback(async () => {
+    if (!isLoggedIn) {
+      setUserFavorites([]);
+      return;
+    }
+    
+    try {
+      const response = await axios.get(`${API_URL}/favorites`);
+      const favoriteIds = response.data.map(fav => fav._id);
+      setUserFavorites(favoriteIds);
+    } catch (err) {
+      console.error('Error al cargar favoritos:', err);
+      // No mostrar error al usuario, simplemente no cargar favoritos
+      setUserFavorites([]);
+    }
+  }, [isLoggedIn]);
+
   // useEffect para llamar a fetchAllRecipes al montar el componente
   useEffect(() => {
     fetchAllRecipes();
   }, [fetchAllRecipes]);
 
+  // useEffect para cargar favoritos cuando cambia el estado de login
+  useEffect(() => {
+    fetchUserFavorites();
+  }, [fetchUserFavorites]);
+
   // Función para aplicar filtros, ordenación Y paginación en el frontend
   useEffect(() => {
     let currentRecipes = [...allRecipes]; // Trabaja con una copia de todas las recetas
 
-    // 1. Filtrar por título (searchTerm)
+    // 1. Filtrar por favoritos si está activado
+    if (showFavoritesOnly && isLoggedIn) {
+      currentRecipes = currentRecipes.filter(recipe =>
+        userFavorites.includes(recipe._id)
+      );
+    }
+
+    // 2. Filtrar por título (searchTerm)
     if (searchTerm) {
       currentRecipes = currentRecipes.filter(recipe =>
         recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // 2. Filtrar por categorías
+    // 3. Filtrar por categorías
     if (selectedCategories.length > 0) {
       currentRecipes = currentRecipes.filter(recipe =>
         selectedCategories.every(selectedCat =>
@@ -93,14 +125,14 @@ const RecipeList = () => {
       );
     }
 
-    // 3. Filtrar por autor
+    // 4. Filtrar por autor
     if (authorFilter) {
       currentRecipes = currentRecipes.filter(recipe =>
         recipe.author?.username.toLowerCase().includes(authorFilter.toLowerCase())
       );
     }
 
-    // 4. Ordenar
+    // 5. Ordenar
     currentRecipes.sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
@@ -129,7 +161,7 @@ const RecipeList = () => {
       setCurrentPage(1); // Si no hay recetas con los filtros y no estamos en la página 1, ir a la página 1
     }
 
-  }, [searchTerm, selectedCategories, authorFilter, sortOrder, allRecipes, currentPage, recipesPerPage]);
+  }, [searchTerm, selectedCategories, authorFilter, sortOrder, allRecipes, currentPage, recipesPerPage, showFavoritesOnly, userFavorites, isLoggedIn]);
 
 
   // Calcular el número total de páginas (basado en totalFilteredCount)
@@ -247,12 +279,33 @@ const RecipeList = () => {
     navigate(`/recipes/${recipeId}`);
   };
 
+  // Manejador para cambios en favoritos
+  const handleFavoriteChange = (recipeId, isFavorite) => {
+    if (isFavorite) {
+      // Añadir a favoritos si no está ya
+      if (!userFavorites.includes(recipeId)) {
+        setUserFavorites(prev => [...prev, recipeId]);
+      }
+    } else {
+      // Quitar de favoritos
+      setUserFavorites(prev => prev.filter(id => id !== recipeId));
+    }
+  };
+
   if (loading) return <p>Cargando recetas...</p>;
   if (error) return <p className="error-message">{error}</p>;
 
   return (
     <div className="recipe-list-container">
       <h2>Explorar Recetas</h2>
+      
+      {/* Mensaje de bienvenida para usuarios no logueados */}
+      {!isLoggedIn && (
+        <div className="welcome-message">
+          <p>¡Bienvenido a Rescetario by dr.eats! 🍳</p>
+          <p>Explora nuestra colección de deliciosas recetas. <strong>Regístrate</strong> para poder guardar favoritos.</p>
+        </div>
+      )}
 
       {/* Contenedor principal de filtros y ordenación, ahora más estructurado */}
       <div className="filters-and-sort">
@@ -335,9 +388,22 @@ const RecipeList = () => {
           </div>
         </div> {/* Fin .filters-row-one */}
 
-        {/* Fila 2: Ordenación */}
+        {/* Fila 2: Filtros especiales */}
         <div className="sort-row-two">
-          
+          {/* Filtro de favoritos solo para usuarios logueados */}
+          {isLoggedIn && (
+            <div className="favorites-filter-group">
+              <label htmlFor="favorites-only">
+                <input
+                  id="favorites-only"
+                  type="checkbox"
+                  checked={showFavoritesOnly}
+                  onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+                />
+                Solo mis favoritos ❤️
+              </label>
+            </div>
+          )}
         </div> {/* Fin .sort-row-two */}
 
         {/* Fila 3: Controles de Paginación */}
@@ -382,7 +448,13 @@ const RecipeList = () => {
           <p>No se encontraron recetas con los filtros aplicados.</p>
         ) : (
           displayedRecipes.map((recipe) => (
-            <RecipeCard key={recipe._id} recipe={recipe} onClick={handleRecipeClick} />
+            <RecipeCard 
+              key={recipe._id} 
+              recipe={recipe} 
+              onClick={handleRecipeClick}
+              isLoggedIn={isLoggedIn}
+              onFavoriteChange={handleFavoriteChange}
+            />
           ))
         )}
       </div>
