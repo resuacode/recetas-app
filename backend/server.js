@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const authRoutes = require('./routes/authRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 
 // Importar middleware de errores (lo crearemos a continuación)
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
@@ -69,6 +70,7 @@ app.use('/api/users/reset-password', authLimiter); // Restablecer contraseña
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/auth', authRoutes); // O la ruta base que uses para auth
+app.use('/api/favorites', favoriteRoutes);
 
 // Middleware de manejo de errores (siempre al final, después de las rutas)
 app.use(notFound);

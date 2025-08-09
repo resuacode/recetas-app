@@ -29,6 +29,10 @@ const userSchema = mongoose.Schema(
       default: 'user', // Por defecto, los nuevos usuarios son 'user'
       enum: ['user', 'admin'], // Solo permite estos dos valores
     },
+    favorites: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe' // Referencia al modelo Recipe
+    }],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },
