@@ -21,8 +21,8 @@ Este proyecto se construye con una arquitectura **MERN Stack** (MongoDB, Express
 ### Backend
 * **Node.js**: Entorno de ejecución de JavaScript.
 * **Express.js**: Framework web para Node.js, utilizado para construir la API RESTful.
-* **MongoDB**: Base de datos NoSQL flexible y escalable para almacenar los datos de las recetas y usuarios.
-* **Mongoose**: ODM (Object Data Modeling) para MongoDB en Node.js, facilitando la interacción con la base de datos.
+* **MongoDB**: Base de datos NoSQL flexible y escalable para almacenar los datos de las recetas, usuarios y favoritos.
+* **Mongoose**: ODM (Object Data Modeling) para MongoDB en Node.js, facilitando la interacción con la base de datos y gestión de relaciones como favoritos de usuarios.
 * **Express Async Handler**: Simplifica el manejo de errores en rutas asíncronas de Express.
 * **JWT (JSON Web Tokens)**: Para la autenticación y autorización segura de usuarios.
 * **Bcrypt.js**: Librería para el hashing seguro de contraseñas.
@@ -49,19 +49,29 @@ Este proyecto se construye con una arquitectura **MERN Stack** (MongoDB, Express
 ## 💡 Funcionalidades
 
 ### Funcionalidades Generales (Usuarios Anónimos y Registrados)
+* **Acceso Público a Recetas**: Los usuarios no registrados pueden explorar y consultar toda la biblioteca de recetas sin necesidad de crear una cuenta.
 * **Registro de Usuarios**: Crea una nueva cuenta con nickname y correo electrónico. Incluye la aceptación de una **Política de Privacidad**.
 * **Inicio de Sesión**: Accede a la aplicación con tus credenciales.
 * **Recuperación de Contraseña**: Proceso seguro de restablecimiento de contraseña a través de un enlace enviado al correo electrónico (gestionado por Mailgun).
 * **Navegación y Consulta de Recetas**:
-    * **Ver todas las recetas**: Explora un listado completo de recetas disponibles para todos los usuarios.
+    * **Ver todas las recetas**: Explora un listado completo de recetas disponibles para todos los usuarios (registrados y anónimos).
     * **Ver detalle de receta**: Accede a la información detallada de cada receta (ingredientes, instrucciones, tiempos, etc.).
     * **Búsqueda y Filtrado Avanzado**:
         - **Búsqueda por título**: Encuentra recetas por nombre o palabras clave.
         - **Filtro por categorías**: Dropdown con autocompletado para seleccionar múltiples categorías.
         - **Filtro por autor**: Busca recetas de usuarios específicos.
+        - **Filtro por favoritos**: Solo para usuarios registrados, muestra únicamente las recetas marcadas como favoritas.
         - **Ordenación flexible**: Por fecha de creación, título, autor, etc. (ascendente/descendente).
         - **Paginación configurable**: 10, 20 o 50 recetas por página.
     * **Ingredientes con formato avanzado**: Visualización inteligente de cantidades en formato de fracciones, decimales y números mixtos.
+
+### Funcionalidades Exclusivas para Usuarios Registrados
+* **Sistema de Favoritos**: 
+    * **Marcar/desmarcar favoritos**: Añade o quita recetas de tu lista personal de favoritos con un simple clic en el ícono de corazón.
+    * **Filtrado por favoritos**: Usa el filtro "Solo mis favoritos ❤️" para ver únicamente tus recetas guardadas.
+    * **Sincronización en tiempo real**: Los cambios en favoritos se reflejan inmediatamente en todos los filtros y vistas.
+    * **Persistencia**: Tus favoritos se guardan en tu perfil y están disponibles desde cualquier dispositivo al iniciar sesión.
+* **Acceso a funcionalidades premium**: Los usuarios registrados disfrutan de una experiencia completa con todas las herramientas de personalización.
 
 ### Funcionalidades de Administración (Rol 'admin')
 * **Gestión de Mis Recetas**: Los usuarios con rol `admin` pueden acceder a una sección exclusiva para gestionar **únicamente las recetas que ellos mismos han subido**.
@@ -210,6 +220,9 @@ Para ejecutar el proyecto en tu máquina local, tienes dos opciones para el back
 ## 🔧 Mejoras y Desarrollo Reciente
 
 ### Funcionalidades Implementadas Recientemente
+* **Acceso público a recetas**: Los usuarios no registrados ahora pueden explorar y consultar toda la biblioteca de recetas sin necesidad de registrarse, fomentando el descubrimiento de contenido antes del registro.
+* **Sistema completo de favoritos**: Implementación de funcionalidad para marcar/desmarcar recetas como favoritas, con botones integrados en tarjetas y vistas de detalle, filtrado específico y sincronización en tiempo real.
+* **Estrategia de conversión freemium**: Los usuarios anónimos pueden ver todas las recetas, pero necesitan registrarse para acceder a funcionalidades premium como favoritos, creando un incentivo natural para el registro.
 * **Sistema de autenticación robusto**: Implementación de interceptores automáticos para manejo de tokens JWT, eliminando la necesidad de configuración manual en cada petición HTTP.
 * **Gestión inteligente de ingredientes**: Soporte para cantidades en formato de fracciones, decimales y números mixtos, con validación automática.
 * **Interfaz móvil mejorada**: Layout optimizado para ingredientes en dispositivos móviles con disposición de dos filas (nombre en primera fila, cantidad y unidad en segunda).
@@ -219,6 +232,8 @@ Para ejecutar el proyecto en tu máquina local, tienes dos opciones para el back
 
 ### Arquitectura de Desarrollo
 * **Gestión centralizada de autenticación**: Archivo `utils/auth.js` con interceptores de Axios para manejo automático de tokens y redirecciones.
+* **Sistema de favoritos escalable**: API RESTful completa para gestión de favoritos con endpoints protegidos y sincronización en tiempo real entre componentes.
+* **Estrategia de acceso gradual**: Arquitectura que permite acceso público a contenido con funcionalidades premium para usuarios registrados.
 * **Validación robusta**: Sistema de validación tanto en frontend como backend, con mensajes de error específicos y UX mejorada.
 * **Código mantenible**: Eliminación de código duplicado para manejo de autenticación en componentes individuales.
 * **Responsive design**: Uso de SCSS modular con mixins y variables para diseño adaptativo consistente.

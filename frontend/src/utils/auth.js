@@ -39,14 +39,72 @@ export const getToken = () => {
   return localStorage.getItem('token');
 };
 
+// Función para decodificar un token JWT sin verificar la firma (solo para obtener el exp)
+const decodeTokenPayload = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    const decodedPayload = atob(payload);
+    return JSON.parse(decodedPayload);
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return null;
+  }
+};
+
+// Función para verificar si el token está próximo a expirar (dentro de 10 minutos)
+const isTokenNearExpiry = (token) => {
+  const payload = decodeTokenPayload(token);
+  if (!payload || !payload.exp) return false;
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  const timeUntilExpiry = payload.exp - currentTime;
+  
+  // Si queda menos de 10 minutos (600 segundos), necesita renovación
+  return timeUntilExpiry < 600;
+};
+
+// Función para renovar el token
+const refreshTokenInternal = async () => {
+  const currentToken = getToken();
+  if (!currentToken) return null;
+
+  try {
+    const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
+      headers: {
+        Authorization: `Bearer ${currentToken}`,
+      },
+    });
+
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      console.log('Token renovado exitosamente');
+      return response.data.token;
+    }
+  } catch (error) {
+    console.error('Error renovando token:', error);
+    return null;
+  }
+};
+
 // Función para configurar el interceptor de Axios
 export const setupAxiosInterceptors = (logout) => {
-  // Interceptor de solicitudes - añade token automáticamente
+  // Interceptor de solicitudes - añade token automáticamente y verifica si necesita renovación
   axios.interceptors.request.use(
-    (config) => {
+    async (config) => {
       const token = getToken();
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        // Verificar si el token necesita renovación antes de usarlo
+        if (isTokenNearExpiry(token)) {
+          console.log('Token próximo a expirar, intentando renovar...');
+          const newToken = await refreshToken();
+          if (newToken) {
+            config.headers.Authorization = `Bearer ${newToken}`;
+          } else {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } else {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
       return config;
     },
@@ -55,26 +113,37 @@ export const setupAxiosInterceptors = (logout) => {
     }
   );
 
-  // Interceptor de respuestas - maneja errores de autenticación
+  // Interceptor de respuestas - maneja errores de autenticación con intento de refresh
   axios.interceptors.response.use(
     (response) => {
       return response;
     },
-    (error) => {
-      if (error.response?.status === 401) {
-        console.log('Token expired or invalid, logging out...');
+    async (error) => {
+      const originalRequest = error.config;
+      
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
         
-        // Evitar múltiples toast si ya se está procesando el logout
-        if (!window.isLoggingOut) {
-          window.isLoggingOut = true;
-          toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-          clearAuthData();
-          logout(); // Función que viene del contexto de la app
+        console.log('Token expirado, intentando renovar...');
+        const newToken = await refreshToken();
+        
+        if (newToken) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return axios(originalRequest); // Reintentar la petición original
+        } else {
+          // Si no se puede renovar el token, hacer logout
+          console.log('No se pudo renovar el token, cerrando sesión...');
           
-          // Reset flag después de un tiempo
-          setTimeout(() => {
-            window.isLoggingOut = false;
-          }, 1000);
+          if (!window.isLoggingOut) {
+            window.isLoggingOut = true;
+            toast.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            clearAuthData();
+            logout();
+            
+            setTimeout(() => {
+              window.isLoggingOut = false;
+            }, 1000);
+          }
         }
       }
       return Promise.reject(error);
