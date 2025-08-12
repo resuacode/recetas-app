@@ -23,7 +23,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [showRegister, setShowRegister] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Nuevo estado para carga inicial
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState('Verificando sesión...');
 
   // console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser); // Puedes quitar este log ahora si quieres
 
@@ -45,8 +46,22 @@ function App() {
     // Validar sesión al cargar la aplicación
     const validateSession = async () => {
       setIsLoadingAuth(true);
+      setLoadingMessage('Verificando sesión...');
+      
+      // Timeout de seguridad para evitar pantalla de carga infinita
+      const timeoutId = setTimeout(() => {
+        console.log('Session validation timeout, proceeding without auth');
+        setIsLoadingAuth(false);
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setUserRole(null);
+        clearAuthData();
+      }, 10000); // 10 segundos máximo
+      
       try {
         const sessionData = await checkSession();
+        
+        clearTimeout(timeoutId); // Cancelar timeout si la validación completa
         
         if (sessionData.isValid) {
           setCurrentUser(sessionData.user);
@@ -66,6 +81,7 @@ function App() {
           clearAuthData();
         }
       } catch (error) {
+        clearTimeout(timeoutId); // Cancelar timeout en caso de error
         console.error('Error during session validation:', error);
         setIsLoggedIn(false);
         setCurrentUser(null);
@@ -95,8 +111,11 @@ function App() {
     return (
       <div className="app-loading-container">
         <div className="loading-spinner">
-          <h2>Verificando sesión...</h2>
+          <h2>{loadingMessage}</h2>
           <div className="spinner"></div>
+          <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.9rem' }}>
+            Si esto tarda mucho, intenta recargar la página
+          </p>
         </div>
       </div>
     );

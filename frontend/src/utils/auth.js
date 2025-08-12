@@ -18,10 +18,16 @@ export const validateToken = async (token) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      timeout: 10000, // 10 segundos de timeout
+      timeout: 5000, // 5 segundos de timeout reducido
     });
     return response.status === 200;
   } catch (error) {
+    // Si es un error de red o timeout, asumir que el token podría ser válido
+    if (error.code === 'ECONNABORTED' || error.code === 'NETWORK_ERROR' || !error.response) {
+      console.log('Error de red durante validación de token, asumiendo válido temporalmente');
+      return true; // Permitir continuar si hay problemas de red
+    }
+    
     console.log('Token validation failed:', error.response?.status || error.message);
     return false;
   }
@@ -61,6 +67,15 @@ const isTokenNearExpiry = (token) => {
   
   // Si queda menos de 10 minutos (600 segundos), necesita renovación
   return timeUntilExpiry < 600;
+};
+
+// Función para verificar si el token está expirado (offline)
+const isTokenExpired = (token) => {
+  const payload = decodeTokenPayload(token);
+  if (!payload || !payload.exp) return true; // Si no se puede decodificar, considerar expirado
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  return payload.exp <= currentTime;
 };
 
 // Función para renovar el token
@@ -182,17 +197,49 @@ export const checkSession = async () => {
       const parsedUser = JSON.parse(userString);
       const parsedRole = JSON.parse(roleString);
 
-      // Validar el token con el backend
-      const isTokenValid = await validateToken(token);
+      // Verificar si el token está expirado localmente primero
+      let currentToken = token;
+      
+      if (isTokenExpired(token)) {
+        console.log('Token expirado, intentando renovar...');
+        // Intentar renovar el token
+        const newToken = await refreshToken();
+        if (newToken) {
+          console.log('Token renovado exitosamente');
+          currentToken = newToken;
+        } else {
+          console.log('No se pudo renovar el token, sesión inválida');
+          clearAuthData();
+          return { isValid: false };
+        }
+      }
+
+      // Validar el token (actual o renovado) con el backend
+      const isTokenValid = await validateToken(currentToken);
       
       if (isTokenValid) {
         return {
           isValid: true,
           user: parsedUser,
           role: parsedRole,
-          token: token
+          token: currentToken
         };
       } else {
+        // Si la validación falla, intentar renovar una vez más
+        console.log('Validación falló, intentando renovar token...');
+        const newToken = await refreshToken();
+        if (newToken) {
+          const isNewTokenValid = await validateToken(newToken);
+          if (isNewTokenValid) {
+            return {
+              isValid: true,
+              user: parsedUser,
+              role: parsedRole,
+              token: newToken
+            };
+          }
+        }
+        
         clearAuthData();
         return { isValid: false };
       }
