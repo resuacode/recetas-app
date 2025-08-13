@@ -43,6 +43,16 @@ function App() {
     // Configurar interceptores de Axios
     setupAxiosInterceptors(handleLogout);
 
+    // Verificación previa: si hay datos incompletos, limpiar inmediatamente
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    const role = localStorage.getItem('role');
+    
+    if ((token && (!user || !role)) || (!token && (user || role))) {
+      console.log('Datos de sesión inconsistentes, limpiando...');
+      clearAuthData();
+    }
+
     // Validar sesión al cargar la aplicación
     const validateSession = async () => {
       setIsLoadingAuth(true);
@@ -56,7 +66,7 @@ function App() {
         setCurrentUser(null);
         setUserRole(null);
         clearAuthData();
-      }, 10000); // 10 segundos máximo
+      }, 8000); // 8 segundos máximo
       
       try {
         const sessionData = await checkSession();
@@ -72,12 +82,6 @@ function App() {
           setIsLoggedIn(false);
           setCurrentUser(null);
           setUserRole(null);
-          
-          // Solo mostrar mensaje si había datos previos (no en carga inicial)
-          const hadToken = localStorage.getItem('token');
-          if (hadToken) {
-            console.log('Previous session found but invalid, clearing...');
-          }
           clearAuthData();
         }
       } catch (error) {
@@ -106,6 +110,16 @@ function App() {
     localStorage.setItem('role', JSON.stringify(role)); // Guarda el rol del usuario
   };
 
+  // Función para forzar limpieza de sesión
+  const forceLogout = () => {
+    clearAuthData();
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setUserRole(null);
+    setIsLoadingAuth(false);
+    window.location.reload(); // Recargar la página para empezar limpio
+  };
+
   // Mostrar pantalla de carga mientras se valida la sesión
   if (isLoadingAuth) {
     return (
@@ -116,6 +130,21 @@ function App() {
           <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.9rem' }}>
             Si esto tarda mucho, intenta recargar la página
           </p>
+          <button 
+            onClick={forceLogout}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem'
+            }}
+          >
+            Limpiar sesión y continuar
+          </button>
         </div>
       </div>
     );
