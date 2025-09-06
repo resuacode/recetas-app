@@ -295,6 +295,7 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
   if (loading) return (
     <>
       <p>Cargando recetas...</p>
+      <br />
       <p>Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)</p>
     </>
   );
@@ -309,12 +310,16 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
         <div className="welcome-message">
           <p>¡Bienvenido a Rescetario by dr.eats! 🍳</p>
           <p>Antes de nada, debes saber que esta web nació con la única finalidad de almacenar y tener acceso rápido y cómodo a mis recetas favoritas.
-            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención o de otros colaboradores de la web, otros son sacados de libros o de internet. Siempre que una receta sea una versión o esté basada en otra fuente, intento indicarlo en la propia receta.  
+            <br />
+            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención o de otros colaboradores de la web, otros son sacados de libros o de internet. 
+            <br />
+            Siempre que una receta sea una versión o esté basada en otra fuente, intento indicarlo en la propia receta.  
+            <br />
             No soy chef profesional, simplemente un aficionado a la cocina que disfruta experimentando y compartiendo sus hallazgos culinarios.
           </p>
           <p>Siéntete libre de explorar nuestra colección de deliciosas recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
           <p>¡Espero que disfrutes de tu experiencia en el Rescetario!</p>
-          <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats" target="_blank" rel="noopener noreferrer">@dr.eats</a></p>
+          <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats32" target="_blank" rel="noopener noreferrer">@dr.eats32</a></p>
         </div>
       )}
 
