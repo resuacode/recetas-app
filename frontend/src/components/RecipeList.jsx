@@ -303,7 +303,13 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
       {!isLoggedIn && (
         <div className="welcome-message">
           <p>¡Bienvenido a Rescetario by dr.eats! 🍳</p>
-          <p>Explora nuestra colección de deliciosas recetas. <strong>Regístrate</strong> para poder guardar favoritos.</p>
+          <p>Antes de nada, debes saber que esta web nació con la única finalidad de almacenar y tener acceso rápido y cómodo a mis recetas favoritas.
+            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención o de otros colaboradores de la web, otros son sacados de libros o de internet. Siempre que una receta sea una versión o esté basada en otra fuente, intento indicarlo en la propia receta.  
+            No soy chef profesional, simplemente un aficionado a la cocina que disfruta experimentando y compartiendo sus hallazgos culinarios.
+          </p>
+          <p>Siéntete libre de explorar nuestra colección de deliciosas recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
+          <p>¡Espero que disfrutes de tu experiencia en el Rescetario!</p>
+          <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats" target="_blank" rel="noopener noreferrer">@dr.eats</a></p>
         </div>
       )}
 
