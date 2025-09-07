@@ -1,3 +1,8 @@
+// Bloque de mensajes de carga siempre en columna
+.loading-block {
+  display: block;
+  width: 100%;
+}
 // Mensaje de carga de recetas
 .loading-message {
   display: block;
