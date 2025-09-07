@@ -294,8 +294,8 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
 
   if (loading) return (
       <>
-        <p>Cargando recetas...</p>
-        <p style={{ marginTop: '1em' }}>
+        <p className="loading-message">Cargando recetas...</p>
+        <p className="loading-message">
           Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)
         </p>
       </>
