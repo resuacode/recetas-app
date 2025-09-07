@@ -295,33 +295,34 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
   if (loading) return (
     <>
       <p>Cargando recetas...</p>
-      <br />
-      <p>Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)</p>
+      <p><br />Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)</p>
     </>
   );
   if (error) return <p className="error-message">{error}</p>;
 
   return (
     <div className="recipe-list-container">
-      <h2>Explorar Recetas</h2>
       
       {/* Mensaje de bienvenida para usuarios no logueados */}
       {!isLoggedIn && (
         <div className="welcome-message">
           <p>¡Bienvenido a Rescetario by dr.eats! 🍳</p>
-          <p>Antes de nada, debes saber que esta web nació con la única finalidad de almacenar y tener acceso rápido y cómodo a mis recetas favoritas.
+          <p>Antes de nada, debes saber que esta web nació con la única finalidad de almacenar y tener un acceso rápido y cómodo a mis recetas favoritas.
             <br />
-            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención o de otros colaboradores de la web, otros son sacados de libros o de internet. 
+            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención y otros de colaboradores de la web, otros son sacados de libros o de internet. 
             <br />
-            Siempre que una receta sea una versión o esté basada en otra fuente, intento indicarlo en la propia receta.  
+            Siempre que una receta sea una versión o esté basada en otra existente, lo indicamos en la propia receta.  
             <br />
-            No soy chef profesional, simplemente un aficionado a la cocina que disfruta experimentando y compartiendo sus hallazgos culinarios.
+            No somos profesionales, simplemente unos aficionados a la cocina que disfrutan experimentando y compartiendo sus hallazgos culinarios.
           </p>
-          <p>Siéntete libre de explorar nuestra colección de deliciosas recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
+          <br />
+          <p>Siéntete libre de explorar nuestra colección de recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
           <p>¡Espero que disfrutes de tu experiencia en el Rescetario!</p>
           <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats32" target="_blank" rel="noopener noreferrer">@dr.eats32</a></p>
         </div>
       )}
+
+      <h2>Explorar Recetas</h2>
 
       {/* Contenedor principal de filtros y ordenación, ahora más estructurado */}
       <div className="filters-and-sort">
