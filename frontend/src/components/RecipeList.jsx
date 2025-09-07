@@ -293,11 +293,13 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
   };
 
   if (loading) return (
-    <>
-      <p>Cargando recetas...</p>
-      <p><br />Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)</p>
-    </>
-  );
+      <>
+        <p>Cargando recetas...</p>
+        <p style={{ marginTop: '1em' }}>
+          Esto podría tardar hasta unos 30 segundos si hace tiempo que no entras en la web, esto es un proyecto gratuito y el servidor puede tardar en arrancar, ten paciencia por favor ;)
+        </p>
+      </>
+    );
   if (error) return <p className="error-message">{error}</p>;
 
   return (
