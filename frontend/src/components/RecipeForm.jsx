@@ -280,8 +280,12 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
 
   // Instrucciones (Pasos)
   const handleInstructionChange = (index, value) => {
+    // 1. Eliminar saltos de línea al inicio y final
+    let processed = value.replace(/^[\n\r]+|[\n\r]+$/g, '');
+    // 2. Convertir saltos de línea intermedios en <br>
+    processed = processed.replace(/([\n\r]+)/g, '<br>');
     const newInstructions = [...formData.instructions];
-    newInstructions[index] = { step: value };
+    newInstructions[index] = { step: processed };
     setFormData({ ...formData, instructions: newInstructions });
   };
   const addInstructionField = () => setFormData({ ...formData, instructions: [...formData.instructions, { step: '' }] });
