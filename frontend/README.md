@@ -2,6 +2,14 @@
 
 Aplicación React para explorar recetas, autenticarse, gestionar favoritos y administrar recetas (rol admin).
 
+## Funcionalidades destacadas
+- Compartir recetas desde el detalle con Web Share API (móvil) y fallback en escritorio.
+- Descargar receta en PDF desde el detalle con:
+	- marca de agua `rescetario.resuacode.es`
+	- título, subtítulo y campo "basado en"
+	- imagen principal (50% más pequeña en PDF)
+	- ingredientes, pasos y metadatos finales (categorías, autor, tiempos, porciones).
+
 ## Stack
 - React 19
 - Vite

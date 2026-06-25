@@ -25,6 +25,78 @@
   flex: 1;
 }
 
+.recipe-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.share-button {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.download-pdf-button {
+  background-color: #205072;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.download-pdf-button:hover {
+  background-color: #17394f;
+  transform: translateY(-1px);
+}
+
+.download-pdf-button:active {
+  transform: translateY(0);
+}
+
+.download-pdf-button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.download-pdf-button:disabled::after {
+  content: '';
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-left: 0.4rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: pdfSpin 0.8s linear infinite;
+  vertical-align: text-bottom;
+}
+
+.pdf-status-message {
+  margin: 0.2rem 0 0.8rem;
+  font-size: 0.92rem;
+  color: var(--primary-dark);
+}
+
+.share-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.share-button:active {
+  transform: translateY(0);
+}
+
 .recipe-detail-container h2 {
   color: var(--primary-color);
   margin-top: 0;
@@ -162,4 +234,121 @@
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
+}
+
+.pdf-export-root {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 210mm;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pdf-recipe-sheet {
+  position: relative;
+  width: 210mm;
+  min-height: 297mm;
+  background-color: #ffffff;
+  color: #333;
+  padding: 18mm 16mm;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.55;
+  overflow: hidden;
+}
+
+.pdf-watermark {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-28deg);
+  font-size: 42px;
+  font-weight: 700;
+  color: rgba(32, 80, 114, 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.pdf-title {
+  font-size: 32px;
+  margin: 0 0 10px;
+  color: #205072;
+}
+
+.pdf-subtitle {
+  font-size: 16px;
+  margin: 0 0 10px;
+  color: #4d4d4d;
+}
+
+.pdf-based-on {
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+  margin: 0 0 16px;
+}
+
+.pdf-image-wrapper {
+  margin: 12px 0 18px;
+  text-align: center;
+}
+
+.pdf-recipe-image {
+  width: 50%;
+  max-width: 320px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.pdf-section {
+  margin-top: 16px;
+}
+
+.pdf-section h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: #205072;
+}
+
+.pdf-section ul,
+.pdf-section ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.pdf-section li {
+  margin-bottom: 6px;
+}
+
+.pdf-meta {
+  border-top: 1px solid #d5d5d5;
+  padding-top: 12px;
+  margin-top: 18px;
+}
+
+.pdf-meta p {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+@keyframes pdfSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .recipe-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recipe-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }

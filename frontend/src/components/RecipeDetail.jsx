@@ -1,7 +1,8 @@
 // frontend/src/components/RecipeDetail.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Importa useParams y useNavigate
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import FavoriteButton from './FavoriteButton';
 import RatingDisplay from './RatingDisplay';
 import RatingInput from './RatingInput';
@@ -15,6 +16,10 @@ const RecipeDetail = ({ isLoggedIn }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [ratings, setRatings] = useState({ average: 0, count: 0 });
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [pdfStatusText, setPdfStatusText] = useState('');
+  const pdfContentRef = useRef(null);
+  const html2pdfLoaderRef = useRef(null);
 
   // Función auxiliar para mostrar fracciones de forma más elegante
   const formatQuantity = (quantity) => {
@@ -85,6 +90,130 @@ const RecipeDetail = ({ isLoggedIn }) => {
     fetchRatings();
   }, [fetchRecipeDetail, fetchRatings]);
 
+  useEffect(() => {
+    const preloadHtml2Pdf = () => {
+      if (!html2pdfLoaderRef.current) {
+        html2pdfLoaderRef.current = import('html2pdf.js');
+      }
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(preloadHtml2Pdf, { timeout: 2000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(preloadHtml2Pdf, 1200);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  const handleShareRecipe = useCallback(async () => {
+    if (!recipe) return;
+
+    const shareMessage = `Descubre esta fantastica receta de ${recipe.title} en el Recetario by dr.eats`;
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: recipe.title,
+      text: shareMessage,
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      const fallbackText = `${shareMessage}\n${shareUrl}`;
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(fallbackText);
+        toast.success('Enlace copiado para compartir');
+        return;
+      }
+
+      window.prompt('Copia y comparte esta receta:', fallbackText);
+    } catch (err) {
+      if (err?.name !== 'AbortError') {
+        toast.error('No se pudo compartir la receta');
+      }
+    }
+  }, [recipe]);
+
+  const getIngredientLine = useCallback((ingredient) => {
+    const hasQuantity = ingredient.quantity && ingredient.quantity.toString().trim() !== '';
+    const hasUnit = ingredient.unit && ingredient.unit.trim() !== '';
+    const formattedQuantity = formatQuantity(ingredient.quantity);
+
+    if (hasQuantity && hasUnit) {
+      return `${formattedQuantity} ${ingredient.unit} de ${ingredient.name}`;
+    }
+
+    if (hasQuantity && !hasUnit) {
+      return `${formattedQuantity} ${ingredient.name}`;
+    }
+
+    if (!hasQuantity && hasUnit) {
+      return `${ingredient.unit} de ${ingredient.name}`;
+    }
+
+    return ingredient.name;
+  }, []);
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!recipe || !pdfContentRef.current) {
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+    setPdfStatusText('Preparando contenido para descargar...');
+    const toastId = toast.loading('Preparando PDF...');
+
+    try {
+      const html2pdfPromise = html2pdfLoaderRef.current || import('html2pdf.js');
+      html2pdfLoaderRef.current = html2pdfPromise;
+      const html2pdfModule = await html2pdfPromise;
+      const html2pdf = html2pdfModule.default;
+      const fileName = `receta-${recipe.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') || 'sin-titulo'}.pdf`;
+
+      setPdfStatusText('Generando PDF...');
+      toast.loading('Generando PDF...', { id: toastId });
+
+      await html2pdf()
+        .from(pdfContentRef.current)
+        .set({
+          margin: [10, 10, 10, 10],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+          },
+          pagebreak: {
+            mode: ['css', 'legacy'],
+          },
+        })
+        .save();
+
+      toast.success('PDF descargado correctamente', { id: toastId });
+    } catch (err) {
+      console.error('Error al descargar PDF:', err);
+      toast.error('No se pudo generar el PDF de la receta', { id: toastId });
+    } finally {
+      setIsDownloadingPdf(false);
+      setPdfStatusText('');
+    }
+  }, [recipe]);
+
   if (loading) return <p className="loading-message">Cargando detalles de la receta...</p>;
   if (error) return (
     <div className="error-container">
@@ -115,13 +244,39 @@ const RecipeDetail = ({ isLoggedIn }) => {
     <div className="recipe-detail-container">
       <div className="recipe-header">
         <h2>{recipe.title}</h2>
-        <FavoriteButton 
-          recipeId={recipe._id} 
-          isLoggedIn={isLoggedIn} 
-          size="large"
-          onFavoriteChange={() => {}} // Callback vacío para RecipeDetail
-        />
+        <div className="recipe-header-actions">
+          <FavoriteButton 
+            recipeId={recipe._id} 
+            isLoggedIn={isLoggedIn} 
+            size="large"
+            onFavoriteChange={() => {}} // Callback vacío para RecipeDetail
+          />
+          <button
+            type="button"
+            className="share-button"
+            onClick={handleShareRecipe}
+            title="Compartir receta"
+            aria-label="Compartir receta"
+          >
+            Compartir
+          </button>
+          <button
+            type="button"
+            className="download-pdf-button"
+            onClick={handleDownloadPdf}
+            title="Descargar receta en PDF"
+            aria-label="Descargar receta en PDF"
+            disabled={isDownloadingPdf}
+          >
+            {isDownloadingPdf ? 'Generando...' : 'Descargar PDF'}
+          </button>
+        </div>
       </div>
+      {pdfStatusText && (
+        <p className="pdf-status-message" role="status" aria-live="polite">
+          {pdfStatusText}
+        </p>
+      )}
       <RatingDisplay average={ratings.average} count={ratings.count} />
       <p className="recipe-description">{recipe.description}</p>
 
@@ -161,21 +316,7 @@ const RecipeDetail = ({ isLoggedIn }) => {
           <h3>Ingredientes:</h3>
           <ul>
             {recipe.ingredients.map((ingredient, index) => {
-              // Ahora quantity puede ser string (fracciones), así que validamos diferente
-              const hasQuantity = ingredient.quantity && ingredient.quantity.toString().trim() !== '';
-              const hasUnit = ingredient.unit && ingredient.unit.trim() !== '';
-              const formattedQuantity = formatQuantity(ingredient.quantity);
-              
-              if (hasQuantity && hasUnit) {
-                return <li key={index}>{formattedQuantity} {ingredient.unit} de {ingredient.name}</li>;
-              } else if (hasQuantity && !hasUnit) {
-                // Si solo hay cantidad y nombre (sin unidad), no mostrar "de"
-                return <li key={index}>{formattedQuantity} {ingredient.name}</li>;
-              } else if (!hasQuantity && hasUnit) {
-                return <li key={index}>{ingredient.unit} de {ingredient.name}</li>;
-              } else {
-                return <li key={index}>{ingredient.name}</li>;
-              }
+              return <li key={index}>{getIngredientLine(ingredient)}</li>;
             })}
           </ul>
         </div>
@@ -215,6 +356,59 @@ const RecipeDetail = ({ isLoggedIn }) => {
           onRatingSubmitted={fetchRatings}
         />
         <button onClick={() => navigate(-1)} className="back-button">Volver a la lista de recetas</button> {/* Botón para volver */}
+
+        <div className="pdf-export-root" aria-hidden="true">
+          <div className="pdf-recipe-sheet" ref={pdfContentRef}>
+            <div className="pdf-watermark">rescetario.resuacode.es</div>
+
+            <h1 className="pdf-title">{recipe.title}</h1>
+            <p className="pdf-subtitle">{recipe.description || 'Sin subtitulo'}</p>
+
+            {recipe.basedOn && recipe.basedOn.trim() !== '' && (
+              <p className="pdf-based-on">Basado en: {recipe.basedOn}</p>
+            )}
+
+            {recipe.imagesUrl && recipe.imagesUrl.length > 0 && (
+              <div className="pdf-image-wrapper">
+                <img
+                  src={recipe.imagesUrl[0]}
+                  alt={`Imagen de ${recipe.title}`}
+                  className="pdf-recipe-image"
+                />
+              </div>
+            )}
+
+            {recipe.ingredients && recipe.ingredients.length > 0 && (
+              <section className="pdf-section">
+                <h2>Ingredientes</h2>
+                <ul>
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={`pdf-ingredient-${index}`}>{getIngredientLine(ingredient)}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {isPresent(recipe.instructions) && (
+              <section className="pdf-section">
+                <h2>Preparacion</h2>
+                <ol>
+                  {recipe.instructions.map((inst, index) => (
+                    <li key={`pdf-step-${index}`} dangerouslySetInnerHTML={{ __html: inst.step }}></li>
+                  ))}
+                </ol>
+              </section>
+            )}
+
+            <section className="pdf-section pdf-meta">
+              <p><strong>Categorias:</strong> {recipe.categories?.join(', ') || 'N/A'}</p>
+              <p><strong>Autor:</strong> {recipe.author?.username || 'Desconocido'}</p>
+              <p><strong>Tiempo de preparacion:</strong> {isPresent(recipe.prepTime) ? `${recipe.prepTime} mins` : 'N/A'}</p>
+              <p><strong>Tiempo de coccion:</strong> {isPresent(recipe.cookTime) ? `${recipe.cookTime} mins` : 'N/A'}</p>
+              <p><strong>Porciones:</strong> {isPresent(recipe.servings) ? recipe.servings : 'N/A'}</p>
+            </section>
+          </div>
+        </div>
     </div>
   );
 };

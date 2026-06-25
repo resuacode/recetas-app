@@ -103,6 +103,8 @@ Servicios:
 - Listado y detalle de recetas en acceso publico.
 - Favoritos para usuarios autenticados.
 - Valoraciones de 1-5 estrellas para usuarios autenticados (una por usuario/receta).
+- Compartir recetas desde detalle con panel nativo en móvil.
+- Descarga de receta en PDF con marca de agua y contenido estructurado.
 - Gestion de recetas para rol admin.
 
 ## Endpoints base
