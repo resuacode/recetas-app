@@ -185,7 +185,7 @@ const RecipeDetail = ({ isLoggedIn }) => {
       await html2pdf()
         .from(pdfContentRef.current)
         .set({
-          margin: [10, 10, 10, 10],
+          margin: [12, 12, 12, 12],
           filename: fileName,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
@@ -199,7 +199,7 @@ const RecipeDetail = ({ isLoggedIn }) => {
             orientation: 'portrait',
           },
           pagebreak: {
-            mode: ['css', 'legacy'],
+            mode: ['avoid-all', 'css', 'legacy'],
           },
         })
         .save();
@@ -253,22 +253,24 @@ const RecipeDetail = ({ isLoggedIn }) => {
           />
           <button
             type="button"
-            className="share-button"
+            className="icon-action-button share-button"
             onClick={handleShareRecipe}
             title="Compartir receta"
             aria-label="Compartir receta"
           >
-            Compartir
+            <span className="icon-action" aria-hidden="true">📤</span>
           </button>
           <button
             type="button"
-            className="download-pdf-button"
+            className="icon-action-button download-pdf-button"
             onClick={handleDownloadPdf}
             title="Descargar receta en PDF"
             aria-label="Descargar receta en PDF"
             disabled={isDownloadingPdf}
           >
-            {isDownloadingPdf ? 'Generando...' : 'Descargar PDF'}
+            <span className="icon-action" aria-hidden="true">
+              {isDownloadingPdf ? '⏳' : '📄'}
+            </span>
           </button>
         </div>
       </div>
