@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Importa useParams y useNavigate
 import axios from 'axios';
 import FavoriteButton from './FavoriteButton';
+import RatingDisplay from './RatingDisplay';
+import RatingInput from './RatingInput';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,6 +14,7 @@ const RecipeDetail = ({ isLoggedIn }) => {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ratings, setRatings] = useState({ average: 0, count: 0 });
 
   // Función auxiliar para mostrar fracciones de forma más elegante
   const formatQuantity = (quantity) => {
@@ -65,9 +68,22 @@ const RecipeDetail = ({ isLoggedIn }) => {
     }
   }, [id]); // Dependencia del ID de la URL
 
+  const fetchRatings = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_URL}/ratings/recipe/${id}`);
+      setRatings({
+        average: response.data.average,
+        count: response.data.count,
+      });
+    } catch (err) {
+      console.error('Error al cargar ratings:', err);
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchRecipeDetail();
-  }, [fetchRecipeDetail]);
+    fetchRatings();
+  }, [fetchRecipeDetail, fetchRatings]);
 
   if (loading) return <p className="loading-message">Cargando detalles de la receta...</p>;
   if (error) return (
@@ -106,6 +122,7 @@ const RecipeDetail = ({ isLoggedIn }) => {
           onFavoriteChange={() => {}} // Callback vacío para RecipeDetail
         />
       </div>
+      <RatingDisplay average={ratings.average} count={ratings.count} />
       <p className="recipe-description">{recipe.description}</p>
 
       {/* Mostrar "basado en" solo si existe y no está vacío/nulo */}
@@ -192,6 +209,11 @@ const RecipeDetail = ({ isLoggedIn }) => {
         )}
         
       </div>
+        <RatingInput 
+          recipeId={recipe._id}
+          isLoggedIn={isLoggedIn}
+          onRatingSubmitted={fetchRatings}
+        />
         <button onClick={() => navigate(-1)} className="back-button">Volver a la lista de recetas</button> {/* Botón para volver */}
     </div>
   );

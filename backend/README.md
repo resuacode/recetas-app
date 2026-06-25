@@ -72,6 +72,15 @@ Todas las rutas requieren autenticación:
 - `POST /api/favorites/:recipeId`
 - `DELETE /api/favorites/:recipeId`
 
+### Valoraciones
+- `GET /api/ratings/recipe/:recipeId` (público) - Retorna `{average, count, ratings}`
+- `GET /api/ratings/recipe/:recipeId/user` (protegido) - Obtiene valoración del usuario actual
+- `POST /api/ratings` (protegido) - Crear o actualizar valoración
+  - Body: `{recipeId, score}` donde score es 1-5
+- `DELETE /api/ratings/:recipeId` (protegido) - Eliminar valoración del usuario actual
+
+**Restricción**: Un usuario solo puede tener una valoración por receta (unique index en [recipe, user])
+
 ## Seguridad y middlewares
 - CORS con lista de orígenes permitidos (`localhost`, `127.0.0.1`, `FRONTEND_URL`).
 - Rate limiting:

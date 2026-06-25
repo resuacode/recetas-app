@@ -102,6 +102,7 @@ Servicios:
 - Validacion y refresh de token.
 - Listado y detalle de recetas en acceso publico.
 - Favoritos para usuarios autenticados.
+- Valoraciones de 1-5 estrellas para usuarios autenticados (una por usuario/receta).
 - Gestion de recetas para rol admin.
 
 ## Endpoints base
@@ -110,6 +111,7 @@ Servicios:
 - Auth: `/api/auth/*`
 - Recetas: `/api/recipes/*`
 - Favoritos: `/api/favorites/*`
+- Valoraciones: `/api/ratings/*`
 
 Ver detalle completo en `backend/README.md`.
 
