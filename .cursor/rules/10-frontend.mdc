@@ -1,0 +1,25 @@
+---
+description: Reglas para tareas frontend
+globs:
+  - "frontend/**/*"
+alwaysApply: false
+---
+
+# Frontend Agent Rules
+
+## Prioridades
+- Mantener rutas y flujo de autenticación existentes.
+- Reutilizar utilidades en `frontend/src/utils/`.
+- Evitar duplicar lógica de API y auth.
+
+## Estilo y estructura
+- Componentes en `frontend/src/components/`.
+- Páginas en `frontend/src/pages/`.
+- Estilos en SCSS modular dentro de `frontend/src/styles/`.
+
+## Validación
+- Ejecutar `npm run lint` en `frontend/`.
+- Ejecutar `npm run build` cuando el cambio afecte rutas, bundles o imports globales.
+
+## Documentación
+- Si cambia UX, rutas o setup, actualizar `frontend/README.md`.

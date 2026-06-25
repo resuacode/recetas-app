@@ -1,0 +1,30 @@
+---
+description: Reglas para tareas backend
+globs:
+  - "backend/**/*"
+alwaysApply: false
+---
+
+# Backend Agent Rules
+
+## Prioridades
+- Mantener contratos REST existentes salvo requerimiento explícito.
+- Separar lógica de negocio en controladores.
+- Mantener middlewares de seguridad y manejo de errores.
+
+## Estructura
+- Rutas en `backend/routes/`.
+- Lógica en `backend/controllers/`.
+- Persistencia y esquema en `backend/models/`.
+
+## Seguridad
+- Conservar validación de token/rol.
+- Evitar devolver datos sensibles en respuestas.
+- Mantener o mejorar validaciones de input.
+
+## Validación
+- Ejecutar `npm start` en `backend/` para smoke test.
+- Probar endpoint principal impactado.
+
+## Documentación
+- Si cambian endpoints/env vars, actualizar `backend/README.md` y README raíz.

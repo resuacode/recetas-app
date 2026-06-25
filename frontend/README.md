@@ -1,12 +1,73 @@
-# React + Vite
+# Frontend - recetas-app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación React para explorar recetas, autenticarse, gestionar favoritos y administrar recetas (rol admin).
 
-Currently, two official plugins are available:
+## Stack
+- React 19
+- Vite
+- React Router DOM
+- Axios
+- react-hot-toast
+- SCSS modular
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Estructura
+- `src/App.jsx`: router principal y control de sesión.
+- `src/components/`: vistas y componentes funcionales.
+- `src/pages/`: páginas específicas (p. ej. política de privacidad).
+- `src/utils/api.js`: instancia de Axios.
+- `src/utils/auth.js`: interceptores, validación de token y refresh.
+- `src/styles/`: estilos SCSS por capas y componentes.
 
-## Expanding the ESLint configuration
+## Scripts
+Desde `frontend/`:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Instalar dependencias:
+	- `npm install`
+- Desarrollo:
+	- `npm run dev`
+- Lint:
+	- `npm run lint`
+- Build producción:
+	- `npm run build`
+- Preview build:
+	- `npm run preview`
+
+## Variables de entorno
+Crear `frontend/.env` con:
+
+- `VITE_API_BASE_URL=http://localhost:5000/api`
+
+## Rutas SPA
+- `/` listado de recetas
+- `/recipes/:id` detalle de receta
+- `/login` login
+- `/register` registro
+- `/forgot-password` solicitud de recuperación
+- `/reset-password` restablecimiento
+- `/politica-de-privacidad` política
+- `/manage-recipes` panel admin
+- `/manage-recipes/new` alta receta (admin)
+- `/manage-recipes/edit/:id` edición receta (admin)
+
+## Flujo de autenticación
+1. Al iniciar app, `checkSession()` valida datos en localStorage y token.
+2. Si el token está próximo a expirar, se intenta `refresh-token`.
+3. Interceptor de request añade `Authorization: Bearer <token>`.
+4. Interceptor de response reintenta una vez en `401` tras refresh.
+5. Si falla, limpia sesión y fuerza logout controlado.
+
+## Convenciones de desarrollo
+- Reutilizar utilidades en `src/utils/` antes de crear nuevas.
+- Mantener estilos en SCSS modular (`src/styles/`).
+- No duplicar llamadas API si ya existe lógica en componentes o utilidades.
+- Si se cambia comportamiento de rutas o auth, actualizar este README.
+
+## Troubleshooting rápido
+1. No conecta con backend
+- Revisar `VITE_API_BASE_URL`.
+
+2. Logout inesperado
+- Verificar expiración JWT y disponibilidad de endpoint `/auth/refresh-token`.
+
+3. Errores CORS
+- Revisar `FRONTEND_URL` en backend y orígenes permitidos.

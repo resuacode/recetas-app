@@ -1,0 +1,25 @@
+---
+description: Reglas globales del proyecto recetas-app
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Objetivo global
+Optimizar tokens y preservar arquitectura existente.
+
+# Reglas generales
+- Haz cambios pequeños y focalizados.
+- No hagas refactors masivos si no se piden.
+- Lee solo archivos necesarios antes de editar.
+- Mantén compatibilidad con contratos actuales.
+- Si cambia comportamiento, actualiza documentación.
+
+# Arquitectura
+- Frontend: React + Vite + SCSS modular (`frontend/src/styles/`).
+- Backend: separación por capas `routes -> controllers -> models`.
+- Seguridad backend: preservar middleware de auth/roles/rate limiting.
+
+# Validación mínima
+- Frontend: lint/build según alcance.
+- Backend: arranque y smoke test de endpoint afectado.

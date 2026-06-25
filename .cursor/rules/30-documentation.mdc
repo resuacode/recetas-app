@@ -1,0 +1,28 @@
+---
+description: Reglas para tareas de documentación
+globs:
+  - "**/*.md"
+alwaysApply: false
+---
+
+# Documentation Agent Rules
+
+## Objetivo
+Documentación exacta y operativa para retomar el proyecto rápidamente.
+
+## Reglas
+- Verificar scripts y rutas reales antes de documentar.
+- Evitar describir funcionalidades no implementadas.
+- Incluir pasos de arranque reproducibles.
+- Resaltar variables de entorno requeridas.
+
+## Archivos foco
+- `README.md`
+- `frontend/README.md`
+- `backend/README.md`
+- `IMPLEMENTACION_AUTH.md`
+
+## Resultado esperado
+- Guía de onboarding clara.
+- Troubleshooting básico para incidencias comunes.
+- Mantenimiento futuro con contexto suficiente.
