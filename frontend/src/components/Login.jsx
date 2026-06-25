@@ -8,7 +8,6 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función para manejar el token
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Estado de carga
 
 
@@ -79,7 +78,6 @@ const Login = ({ onLoginSuccess }) => { // onLoginSuccess será una función par
       <div className="form-links">
         <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
       </div>
-      {message && <p className="message">{message}</p>}
     </div>
   );
 };

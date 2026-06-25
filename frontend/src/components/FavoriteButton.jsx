@@ -1,5 +1,5 @@
 // frontend/src/components/FavoriteButton.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -9,21 +9,21 @@ const FavoriteButton = ({ recipeId, isLoggedIn, size = 'medium', onFavoriteChang
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Verificar si la receta es favorita al cargar el componente
-  useEffect(() => {
-    if (isLoggedIn && recipeId) {
-      checkIfFavorite();
-    }
-  }, [isLoggedIn, recipeId]);
-
-  const checkIfFavorite = async () => {
+  const checkIfFavorite = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/favorites/check/${recipeId}`);
       setIsFavorite(response.data.isFavorite);
     } catch (error) {
       console.error('Error al verificar favorito:', error);
     }
-  };
+  }, [recipeId]);
+
+  // Verificar si la receta es favorita al cargar el componente
+  useEffect(() => {
+    if (isLoggedIn && recipeId) {
+      checkIfFavorite();
+    }
+  }, [isLoggedIn, recipeId, checkIfFavorite]);
 
   const toggleFavorite = async () => {
     if (!isLoggedIn) {

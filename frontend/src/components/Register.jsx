@@ -9,7 +9,6 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [acceptPrivacyPolicy, setAcceptPrivacyPolicy] = useState(false);
 
@@ -37,7 +36,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/users/register`, {
+      await axios.post(`${API_URL}/users/register`, {
         username,
         email,
         password,
@@ -124,7 +123,6 @@ const Register = () => {
           {loading ? 'Registrando...' : 'Registrar'}
         </button>      
         </form>
-      {message && <p className="message">{message}</p>}
     </div>
   );
 };

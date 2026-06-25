@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importa Router, Routes, Route, Navigate
 import { Toaster } from 'react-hot-toast';
-import toast from 'react-hot-toast';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -22,7 +21,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const [showRegister, setShowRegister] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Verificando sesión...');
 
@@ -104,7 +102,6 @@ function App() {
     setIsLoggedIn(true);
     setCurrentUser(user);
     setUserRole(role);
-    setShowRegister(false);
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('role', JSON.stringify(role)); // Guarda el rol del usuario
@@ -202,7 +199,7 @@ function App() {
                 !isLoggedIn ? (
                   <div className="auth-section">
                     <Login onLoginSuccess={handleLoginSuccess} />
-                    <p>¿No tienes cuenta? <button onClick={() => setShowRegister(true)}>Regístrate aquí</button></p>
+                    <p>¿No tienes cuenta? Usa la ruta /register para crear una.</p>
                   </div>
                 ) : (
                   <Navigate to="/" replace />
@@ -216,7 +213,7 @@ function App() {
                 !isLoggedIn ? (
                   <div className="auth-section">
                     <Register />
-                    <p>¿Ya tienes cuenta? <button onClick={() => setShowRegister(false)}>Inicia Sesión</button></p>
+                    <p>¿Ya tienes cuenta? Usa la ruta /login para iniciar sesión.</p>
                   </div>
                 ) : (
                   <Navigate to="/" replace />

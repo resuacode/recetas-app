@@ -463,12 +463,11 @@ const RecipeForm = ({ type = 'create' }) => { // Ya no necesitamos initialData c
         },
       };
 
-      let response;
       if (type === 'create') {
-        response = await axios.post(`${API_URL}/recipes`, dataToSend, config);
+        await axios.post(`${API_URL}/recipes`, dataToSend, config);
         toast.success('Receta creada exitosamente!');
       } else { // 'edit'
-        response = await axios.put(`${API_URL}/recipes/${id}`, dataToSend, config);
+        await axios.put(`${API_URL}/recipes/${id}`, dataToSend, config);
         toast.success('Receta actualizada exitosamente!');
       }
       // console.log('Respuesta del servidor:', response.data);

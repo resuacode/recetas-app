@@ -5,7 +5,7 @@ import RecipeCard from './RecipeCard';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const RecipeList = ({ currentUser, isLoggedIn }) => {
+const RecipeList = ({ isLoggedIn }) => {
   const [allRecipes, setAllRecipes] = useState([]); // Almacena todas las recetas del backend
   const [displayedRecipes, setDisplayedRecipes] = useState([]); // Las recetas que se muestran en la página actual (después de filtros, orden y paginación)
   const [userFavorites, setUserFavorites] = useState([]); // IDs de recetas favoritas del usuario
@@ -26,8 +26,6 @@ const RecipeList = ({ currentUser, isLoggedIn }) => {
   const [allCategories, setAllCategories] = useState([]);
   const [selectedDropdownIndex, setSelectedDropdownIndex] = useState(-1);
 
-  // Ref para el timeout del debouncing (no se usará para el filtrado local, pero lo dejamos)
-  const debounceTimeoutRef = useRef(null);
   const categoryInputRef = useRef(null);
   const dropdownRef = useRef(null);
 

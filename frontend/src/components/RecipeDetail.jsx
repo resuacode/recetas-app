@@ -6,7 +6,7 @@ import FavoriteButton from './FavoriteButton';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const RecipeDetail = ({ currentUser, isLoggedIn }) => {
+const RecipeDetail = ({ isLoggedIn }) => {
   const { id } = useParams(); // Obtiene el ID de la URL
   const navigate = useNavigate(); // Para volver a la lista si es necesario
   const [recipe, setRecipe] = useState(null);

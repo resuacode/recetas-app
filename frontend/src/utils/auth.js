@@ -82,29 +82,6 @@ const isTokenExpired = (token) => {
   return payload.exp <= currentTime;
 };
 
-// Función para renovar el token
-const refreshTokenInternal = async () => {
-  const currentToken = getToken();
-  if (!currentToken) return null;
-
-  try {
-    const response = await axios.post(`${API_URL}/auth/refresh-token`, {}, {
-      headers: {
-        Authorization: `Bearer ${currentToken}`,
-      },
-    });
-
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      console.log('Token renovado exitosamente');
-      return response.data.token;
-    }
-  } catch (error) {
-    console.error('Error renovando token:', error);
-    return null;
-  }
-};
-
 // Función para configurar el interceptor de Axios
 export const setupAxiosInterceptors = (logout) => {
   // Interceptor de solicitudes - añade token automáticamente y verifica si necesita renovación
@@ -188,7 +165,7 @@ export const checkSession = async () => {
   }, 8000); // 8 segundos
   
   try {
-    const token = getToken();
+    let token = getToken();
     const userString = localStorage.getItem('user');
     const roleString = localStorage.getItem('role');
 
