@@ -47,6 +47,9 @@ Base URL local: `http://localhost:5000`
 ### Salud
 - `GET /` -> mensaje de estado API
 
+Nota: este endpoint recibe un ping cada 10 minutos desde `.github/workflows/keep-alive.yml`
+para evitar el "cold start" del plan gratuito de Render (se duerme tras 15 min sin tráfico).
+
 ### Usuarios
 - `POST /api/users/register`
 - `POST /api/users/login`
