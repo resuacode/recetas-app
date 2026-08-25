@@ -1,0 +1,69 @@
+// Breakpoints compartidos: usar siempre estos valores para mantener consistencia responsive
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+
+@mixin respond($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $breakpoint-mobile) { @content; }
+  } @else if $breakpoint == tablet {
+    @media (max-width: $breakpoint-tablet) { @content; }
+  } @else {
+    @media (max-width: $breakpoint) { @content; }
+  }
+}
+
+@mixin flex-between($gap: 0) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $gap;
+}
+
+@mixin flex-center($gap: 0) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $gap;
+}
+
+@mixin card-base {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-light);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+// Trunca texto a $lines líneas con ellipsis (requiere -webkit-box)
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+@mixin pill-badge($bg: var(--accent-color), $color: var(--text-color-light)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: $bg;
+  color: $color;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 500;
+}

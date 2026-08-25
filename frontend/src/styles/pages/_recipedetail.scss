@@ -5,7 +5,7 @@
   width: 100%;
   padding: 2.5rem;
   background-color: var(--card-background);
-  border-radius: 15px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-medium);
   text-align: left;
 }
@@ -116,7 +116,7 @@
   max-height: 550px; /* Limita la altura máxima de las imágenes */
   max-width: 100%;
   height: auto;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   margin-bottom: 15px;
   box-shadow: var(--shadow-light);
 }
@@ -166,15 +166,16 @@
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   margin-bottom: 20px;
   display: inline-block; /* Para que el margin-bottom funcione */
 }
 
 .back-button:hover {
   background-color: #5a6268;
+  transform: translateY(-1px);
 }
 
 .loading-message, .not-found-message {

@@ -14,11 +14,15 @@ const RecipeList = ({ isLoggedIn }) => {
 
   // Estados para filtros y ordenación
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [categoriesInput, setCategoriesInput] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [authorFilter, setAuthorFilter] = useState('');
+  const [durationFilter, setDurationFilter] = useState('any'); // any | short | medium | long
+  const [servingsFilter, setServingsFilter] = useState('any'); // any | 1-2 | 3-4 | 5+
   const [sortOrder, setSortOrder] = useState('createdAt:desc');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showFullWelcome, setShowFullWelcome] = useState(false);
 
   // Estados para el dropdown de categorías
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -94,6 +98,36 @@ const RecipeList = ({ isLoggedIn }) => {
     fetchUserFavorites();
   }, [fetchUserFavorites]);
 
+  // Debounce del término de búsqueda para no re-filtrar en cada pulsación
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // Vuelve a la página 1 cada vez que cambia algún filtro u orden (no al paginar/cambiar tamaño de página)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, selectedCategories, authorFilter, durationFilter, servingsFilter, sortOrder, showFavoritesOnly]);
+
+  // Devuelve el bucket de duración total (prepTime + cookTime) de una receta, o null si no tiene datos
+  const getDurationBucket = (recipe) => {
+    if (recipe.prepTime == null && recipe.cookTime == null) return null;
+    const total = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+    if (total <= 30) return 'short';
+    if (total <= 60) return 'medium';
+    return 'long';
+  };
+
+  // Devuelve el bucket de comensales de una receta, o null si no tiene datos
+  const getServingsBucket = (recipe) => {
+    if (recipe.servings == null) return null;
+    if (recipe.servings <= 2) return '1-2';
+    if (recipe.servings <= 4) return '3-4';
+    return '5+';
+  };
+
   // Función para aplicar filtros, ordenación Y paginación en el frontend
   useEffect(() => {
     let currentRecipes = [...allRecipes]; // Trabaja con una copia de todas las recetas
@@ -105,10 +139,13 @@ const RecipeList = ({ isLoggedIn }) => {
       );
     }
 
-    // 2. Filtrar por título (searchTerm)
-    if (searchTerm) {
+    // 2. Filtrar por término de búsqueda (título, descripción o ingredientes)
+    if (debouncedSearchTerm) {
+      const term = debouncedSearchTerm.toLowerCase();
       currentRecipes = currentRecipes.filter(recipe =>
-        recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
+        recipe.title.toLowerCase().includes(term) ||
+        recipe.description?.toLowerCase().includes(term) ||
+        recipe.ingredients?.some(ing => ing.name?.toLowerCase().includes(term))
       );
     }
 
@@ -130,7 +167,17 @@ const RecipeList = ({ isLoggedIn }) => {
       );
     }
 
-    // 5. Ordenar
+    // 5. Filtrar por duración total (preparación + cocción)
+    if (durationFilter !== 'any') {
+      currentRecipes = currentRecipes.filter(recipe => getDurationBucket(recipe) === durationFilter);
+    }
+
+    // 6. Filtrar por número de comensales
+    if (servingsFilter !== 'any') {
+      currentRecipes = currentRecipes.filter(recipe => getServingsBucket(recipe) === servingsFilter);
+    }
+
+    // 7. Ordenar
     currentRecipes.sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
@@ -144,7 +191,7 @@ const RecipeList = ({ isLoggedIn }) => {
     // Guardar el total de recetas después de filtros y ordenación, antes de la paginación
     setTotalFilteredCount(currentRecipes.length);
 
-    // 5. Aplicar Paginación
+    // 8. Aplicar Paginación
     const indexOfLastRecipe = currentPage * recipesPerPage;
     const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
 
@@ -159,7 +206,7 @@ const RecipeList = ({ isLoggedIn }) => {
       setCurrentPage(1); // Si no hay recetas con los filtros y no estamos en la página 1, ir a la página 1
     }
 
-  }, [searchTerm, selectedCategories, authorFilter, sortOrder, allRecipes, currentPage, recipesPerPage, showFavoritesOnly, userFavorites, isLoggedIn]);
+  }, [debouncedSearchTerm, selectedCategories, authorFilter, durationFilter, servingsFilter, sortOrder, allRecipes, currentPage, recipesPerPage, showFavoritesOnly, userFavorites, isLoggedIn]);
 
 
   // Calcular el número total de páginas (basado en totalFilteredCount)
@@ -180,7 +227,7 @@ const RecipeList = ({ isLoggedIn }) => {
   };
 
 
-  // Manejadores para los filtros (sin cambios)
+  // Manejadores para los filtros
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -188,6 +235,42 @@ const RecipeList = ({ isLoggedIn }) => {
 
   const handleAuthorFilterChange = (e) => setAuthorFilter(e.target.value);
   const handleSortChange = (e) => setSortOrder(e.target.value);
+  const handleDurationFilterChange = (e) => setDurationFilter(e.target.value);
+  const handleServingsFilterChange = (e) => setServingsFilter(e.target.value);
+
+  // Comprueba si hay algún filtro activo (para mostrar chips/reset y mensajes contextuales)
+  const hasActiveFilters = Boolean(
+    debouncedSearchTerm ||
+    selectedCategories.length > 0 ||
+    authorFilter ||
+    durationFilter !== 'any' ||
+    servingsFilter !== 'any' ||
+    showFavoritesOnly
+  );
+
+  // Restablece todos los filtros a sus valores por defecto
+  const handleClearAllFilters = () => {
+    setSearchTerm('');
+    setDebouncedSearchTerm('');
+    setSelectedCategories([]);
+    setCategoriesInput('');
+    setAuthorFilter('');
+    setDurationFilter('any');
+    setServingsFilter('any');
+    setShowFavoritesOnly(false);
+  };
+
+  const durationFilterLabels = {
+    short: 'Hasta 30 min',
+    medium: '30-60 min',
+    long: 'Más de 60 min',
+  };
+
+  const servingsFilterLabels = {
+    '1-2': '1-2 comensales',
+    '3-4': '3-4 comensales',
+    '5+': '5+ comensales',
+  };
 
   const handleAddCategory = (e) => {
     if (e.key === 'Enter') {
@@ -305,48 +388,61 @@ const RecipeList = ({ isLoggedIn }) => {
       
       {/* Mensaje de bienvenida para usuarios no logueados */}
       {!isLoggedIn && (
-        <div className="welcome-message">
-          <p>¡Bienvenido a Rescetario by dr.eats! 🍳</p>
-          <p>Antes de nada, debes saber que esta web nació con la única finalidad de almacenar y tener un acceso rápido y cómodo a mis recetas favoritas.
-            <br />
-            Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención y otros de colaboradores de la web, otros son sacados de libros o de internet. 
-            <br />
-            Siempre que una receta sea una versión o esté basada en otra existente, lo indicamos en la propia receta.  
-            <br />
-            No somos profesionales, simplemente unos aficionados a la cocina que disfrutan experimentando y compartiendo sus hallazgos culinarios.
-          </p>
-          <br />
-          <p>Siéntete libre de explorar nuestra colección de recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
-          <p>¡Espero que disfrutes de tu experiencia en el Rescetario!</p>
-          <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats32" target="_blank" rel="noopener noreferrer">@dr.eats32</a></p>
+        <div className={`welcome-message ${showFullWelcome ? 'expanded' : ''}`}>
+          <p className="welcome-message-title">¡Bienvenido a Rescetario by dr.eats! 🍳</p>
+          <p>Esta web nació con la única finalidad de almacenar y tener un acceso rápido y cómodo a mis recetas favoritas.</p>
+          {showFullWelcome && (
+            <>
+              <p>Estas recetas son fruto de ir probando multitud de platos, algunos de mi propia invención y otros de colaboradores de la web, otros son sacados de libros o de internet.
+                <br />
+                Siempre que una receta sea una versión o esté basada en otra existente, lo indicamos en la propia receta.
+                <br />
+                No somos profesionales, simplemente unos aficionados a la cocina que disfrutan experimentando y compartiendo sus hallazgos culinarios.
+              </p>
+              <p>Siéntete libre de explorar nuestra colección de recetas, está en constante evolución. <strong>Regístrate</strong> para poder guardar favoritos.</p>
+              <p>¡Espero que disfrutes de tu experiencia en el Rescetario!</p>
+              <p>Si quieres comentarme cualquier cosa, no dudes en hacerlo, puedes contactarme vía Instagram <a href="https://www.instagram.com/dr.eats32" target="_blank" rel="noopener noreferrer">@dr.eats32</a></p>
+            </>
+          )}
+          <button
+            type="button"
+            className="welcome-message-toggle"
+            onClick={() => setShowFullWelcome(prev => !prev)}
+          >
+            {showFullWelcome ? 'Leer menos' : 'Leer más'}
+          </button>
         </div>
       )}
 
       <h2>Explorar Recetas</h2>
 
-      {/* Contenedor principal de filtros y ordenación, ahora más estructurado */}
+      {/* Contenedor principal de filtros y ordenación, ahora como toolbar moderna */}
       <div className="filters-and-sort">
-        {/* Fila 1: Filtros principales */}
-        <div className="filters-row-one">
-          <div className="search-bar-group">
-            <label htmlFor="search-title">Buscar por título:</label>
+        <div className="search-bar-group search-bar-group--main">
+          <label htmlFor="search-title">Buscar recetas</label>
+          <div className="search-input-wrapper">
+            <span className="search-icon" aria-hidden="true">🔍</span>
             <input
               id="search-title"
               type="text"
-              placeholder="Escribe para buscar..."
+              placeholder="Busca por título, descripción o ingrediente..."
               value={searchTerm}
               onChange={handleSearchChange}
+              aria-label="Buscar recetas por título, descripción o ingrediente"
             />
           </div>
+        </div>
 
+        {/* Fila de filtros compactos */}
+        <div className="filters-row-one">
           <div className="category-input-group">
-            <label htmlFor="add-category">Añadir categoría:</label>
+            <label htmlFor="add-category">Categorías</label>
             <div className="category-dropdown-container">
               <input
                 ref={categoryInputRef}
                 id="add-category"
                 type="text"
-                placeholder="Escribe o selecciona una categoría..."
+                placeholder="Escribe o selecciona..."
                 value={categoriesInput}
                 onChange={handleCategoryInputChange}
                 onFocus={handleCategoryInputFocus}
@@ -374,40 +470,47 @@ const RecipeList = ({ isLoggedIn }) => {
                 </div>
               )}
             </div>
-            {selectedCategories.length > 0 && (
-              <div className="category-chips-container">
-                {selectedCategories.map((cat, index) => (
-                  <span key={index} className="category-chip">
-                    {cat} <span className="remove-chip" onClick={() => handleRemoveCategory(cat)}>X</span>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="author-filter-group">
-            <label htmlFor="filter-author">Filtrar por autor:</label>
+            <label htmlFor="filter-author">Autor</label>
             <input
               id="filter-author"
               type="text"
-              placeholder="Nombre de usuario del autor..."
+              placeholder="Nombre de usuario..."
               value={authorFilter}
               onChange={handleAuthorFilterChange}
             />
           </div>
 
+          <div className="duration-filter-group">
+            <label htmlFor="filter-duration">Duración</label>
+            <select id="filter-duration" value={durationFilter} onChange={handleDurationFilterChange}>
+              <option value="any">Cualquier duración</option>
+              <option value="short">Hasta 30 min</option>
+              <option value="medium">30-60 min</option>
+              <option value="long">Más de 60 min</option>
+            </select>
+          </div>
+
+          <div className="servings-filter-group">
+            <label htmlFor="filter-servings">Comensales</label>
+            <select id="filter-servings" value={servingsFilter} onChange={handleServingsFilterChange}>
+              <option value="any">Cualquier cantidad</option>
+              <option value="1-2">1-2</option>
+              <option value="3-4">3-4</option>
+              <option value="5+">5+</option>
+            </select>
+          </div>
+
           <div className="sort-by-group">
-            <label htmlFor="sortOrder">Ordenar por:</label>
+            <label htmlFor="sortOrder">Ordenar por</label>
             <select id="sortOrder" value={sortOrder} onChange={handleSortChange}>
               <option value="createdAt:desc">Más recientes</option>
               <option value="createdAt:asc">Más antiguas</option>
             </select>
           </div>
-        </div> {/* Fin .filters-row-one */}
 
-        {/* Fila 2: Filtros especiales */}
-        <div className="sort-row-two">
-          {/* Filtro de favoritos solo para usuarios logueados */}
           {isLoggedIn && (
             <div className="favorites-filter-group">
               <label htmlFor="favorites-only">
@@ -417,66 +520,92 @@ const RecipeList = ({ isLoggedIn }) => {
                   checked={showFavoritesOnly}
                   onChange={(e) => setShowFavoritesOnly(e.target.checked)}
                 />
-                Solo mis favoritos ❤️
+                Solo favoritos ❤️
               </label>
             </div>
           )}
-        </div> {/* Fin .sort-row-two */}
 
-        {/* Fila 3: Controles de Paginación */}
-        <div className="pagination-row-three">
-          <div className="pagination-controls">
-            <div className="recipes-per-page-group">
-              <label htmlFor="recipesPerPage">Recetas por página:</label>
-              <select id="recipesPerPage" value={recipesPerPage} onChange={handleRecipesPerPageChange}>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
-
-            <div className="pagination-buttons">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="pagination-button"
-              >
-                Anterior
-              </button>
-              <span>Página {currentPage} de {totalPages || 1}</span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || totalPages === 0}
-                className="pagination-button"
-              >
-                Siguiente
-              </button>
-            </div>
+          <div className="recipes-per-page-group">
+            <label htmlFor="recipesPerPage">Por página</label>
+            <select id="recipesPerPage" value={recipesPerPage} onChange={handleRecipesPerPageChange}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
           </div>
-        </div> {/* Fin .pagination-row-three */}
+        </div> {/* Fin .filters-row-one */}
+
+        {/* Barra de filtros activos + contador de resultados */}
+        {(hasActiveFilters || totalFilteredCount > 0) && (
+          <div className="active-filters-bar">
+            {hasActiveFilters && (
+              <div className="active-filters-chips">
+                {selectedCategories.map((cat) => (
+                  <span key={`cat-${cat}`} className="category-chip">
+                    {cat} <span className="remove-chip" onClick={() => handleRemoveCategory(cat)}>×</span>
+                  </span>
+                ))}
+                {authorFilter && (
+                  <span className="category-chip">
+                    Autor: {authorFilter} <span className="remove-chip" onClick={() => setAuthorFilter('')}>×</span>
+                  </span>
+                )}
+                {durationFilter !== 'any' && (
+                  <span className="category-chip">
+                    {durationFilterLabels[durationFilter]} <span className="remove-chip" onClick={() => setDurationFilter('any')}>×</span>
+                  </span>
+                )}
+                {servingsFilter !== 'any' && (
+                  <span className="category-chip">
+                    {servingsFilterLabels[servingsFilter]} <span className="remove-chip" onClick={() => setServingsFilter('any')}>×</span>
+                  </span>
+                )}
+                {showFavoritesOnly && (
+                  <span className="category-chip">
+                    Solo favoritos <span className="remove-chip" onClick={() => setShowFavoritesOnly(false)}>×</span>
+                  </span>
+                )}
+                <button type="button" className="clear-all-filters-button" onClick={handleClearAllFilters}>
+                  Limpiar todo
+                </button>
+              </div>
+            )}
+            <p className="results-count" aria-live="polite">
+              Mostrando {displayedRecipes.length} de {totalFilteredCount} {totalFilteredCount === 1 ? 'receta' : 'recetas'}
+            </p>
+          </div>
+        )}
 
       </div> {/* Fin .filters-and-sort */}
 
 
       <div className="recipes-grid">
-        {displayedRecipes.length === 0 && totalFilteredCount > 0 ? (
-          <p>No se encontraron recetas en esta página con los filtros aplicados.</p>
-        ) : displayedRecipes.length === 0 && totalFilteredCount === 0 ? (
-          <p>No se encontraron recetas con los filtros aplicados.</p>
-        ) : (
-          displayedRecipes.map((recipe) => (
-            <RecipeCard 
-              key={recipe._id} 
-              recipe={recipe} 
-              onClick={handleRecipeClick}
-              isLoggedIn={isLoggedIn}
-              onFavoriteChange={handleFavoriteChange}
-            />
-          ))
+        {displayedRecipes.length === 0 && (
+          <div className="empty-state">
+            {hasActiveFilters ? (
+              <>
+                <p>No hay recetas que coincidan con tus filtros.</p>
+                <button type="button" className="clear-all-filters-button" onClick={handleClearAllFilters}>
+                  Limpiar filtros
+                </button>
+              </>
+            ) : (
+              <p>Aún no hay recetas registradas.</p>
+            )}
+          </div>
         )}
+        {displayedRecipes.map((recipe) => (
+          <RecipeCard 
+            key={recipe._id} 
+            recipe={recipe} 
+            onClick={handleRecipeClick}
+            isLoggedIn={isLoggedIn}
+            onFavoriteChange={handleFavoriteChange}
+          />
+        ))}
       </div>
 
-      {/* Repetir los controles de paginación al final para mejor UX */}
+      {/* Controles de paginación (único bloque, al final de la lista) */}
       {totalPages > 1 && (
         <div className="pagination-controls bottom">
           <div className="pagination-buttons">

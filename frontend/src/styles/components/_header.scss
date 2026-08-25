@@ -1,14 +1,17 @@
 /* Header */
 .app-header {
-  background-color: var(--primary-color);
+  background: var(--gradient-primary);
   color: var(--text-color-light);
   padding: 1rem var(--padding-base);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-light);
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
+  box-shadow: var(--shadow-medium);
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .header-center {
@@ -19,7 +22,9 @@
 .header-center h1 {
   margin: 0;
   font-size: 2.2rem;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+  transition: opacity var(--transition-base);
 }
 
 .user-info {
@@ -35,14 +40,15 @@
   color: var(--text-color-light);
   border: none;
   padding: 8px 15px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   box-shadow: var(--shadow-button);
 }
 
 .logout-button:hover {
   background-color: var(--error-dark);
+  transform: translateY(-1px);
 }
 
 .manage-recipes-button {
@@ -50,9 +56,9 @@
   color: var(--text-color-light);
   border: none;
   padding: 8px 15px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   box-shadow: var(--shadow-button);
   text-decoration: none; /* Quita el subrayado de Link */
   display: inline-block; /* Para que padding funcione correctamente */
@@ -61,6 +67,7 @@
 
 .manage-recipes-button:hover {
   background-color: var(--accent-dark);
+  transform: translateY(-1px);
 }
 
 /* Estilos para el enlace del título en el header */
@@ -70,9 +77,8 @@
   /* Opcional: Asegúrate de que el h1 dentro también herede el color si fuera necesario */
 }
 
-.app-title-link:hover {
-  color: var(--text-color-light); /* Mantiene el color blanco al pasar el ratón */
-  text-decoration: none; /* Asegura que no aparezca el subrayado al pasar el ratón */
+.app-title-link:hover h1 {
+  opacity: 0.85;
 }
 
 .app-title { /* Tu h1 dentro del Link */
@@ -93,9 +99,13 @@
   color: var(--text-color-light);
   text-decoration: none;
   padding: 8px 15px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   font-weight: 500;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .login-link {

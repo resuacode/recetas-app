@@ -36,5 +36,26 @@
   --padding-base: 1.8rem;
   --padding-small: 1.2rem;
 
+  --space-1: 0.4rem;
+  --space-2: 0.8rem;
+  --space-3: 1.2rem;
+  --space-4: 1.8rem;
+  --space-5: 2.8rem;
+
+  /* Radios de borde */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+
+  /* Gradientes y sombras adicionales */
+  --gradient-primary: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  --gradient-hero: linear-gradient(135deg, rgba(76, 175, 80, 0.12), rgba(33, 150, 243, 0.12));
+  --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.12);
+
   --max-app-width: 1800px; /* Ancho máximo para el contenido principal en pantallas grandes */
 }

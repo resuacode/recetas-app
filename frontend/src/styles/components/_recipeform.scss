@@ -4,7 +4,7 @@
   width: 100%;
   padding: 1rem;
   background-color: var(--card-background);
-  border-radius: 15px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-medium);
   text-align: left;
 }
@@ -34,11 +34,12 @@
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-sizing: border-box; /* Incluye padding y borde en el ancho total */
   font-size: 1rem;
   color: var(--text-color-dark);
   background-color: var(--background-color);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .recipe-form-container input:focus,
@@ -101,15 +102,16 @@
   color: white;
   border: none;
   padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   margin-top: 10px;
   font-weight: bold;
 }
 
 .add-field-button:hover {
   background-color: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
 /* Estilos específicos para ingredientes */

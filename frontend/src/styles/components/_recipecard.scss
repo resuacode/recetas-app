@@ -1,18 +1,49 @@
+@use '../mixins';
 
 .recipe-card {
-  background-color: var(--background-color); /* Fondo ligeramente diferente al de la lista */
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: var(--shadow-light);
+  @include mixins.card-base;
+  @include mixins.card-hover;
+  overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative; /* Para que el botón de favoritos se posicione correctamente */
+  display: flex;
+  flex-direction: column;
 }
 
-.recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
+.recipe-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--gradient-hero);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-base);
+  }
+}
+
+.recipe-card:hover .recipe-card-image img {
+  transform: scale(1.06);
+}
+
+.recipe-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+.recipe-card-content {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .recipe-card h3 {
@@ -26,6 +57,19 @@
   font-size: 0.95rem;
   line-height: 1.5;
   color: #555;
+  @include mixins.line-clamp(3);
+}
+
+.recipe-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.meta-badge {
+  @include mixins.pill-badge(var(--background-color), var(--text-muted));
+  border: 1px solid var(--border-color);
 }
 
 .recipe-categories {

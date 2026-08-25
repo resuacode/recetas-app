@@ -6,8 +6,8 @@
   padding: 1.5rem var(--padding-base);
   text-align: center;
   font-size: 0.9rem;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
   box-shadow: var(--shadow-light);
 }
 
@@ -18,7 +18,7 @@
 .app-footer a {
   color: var(--accent-color);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color var(--transition-base);
 }
 
 .app-footer a:hover {
@@ -41,7 +41,7 @@
   justify-content: center;
   padding: 10px;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all var(--transition-base);
   text-decoration: none;
 }
 

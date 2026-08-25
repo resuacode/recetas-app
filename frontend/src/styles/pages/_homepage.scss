@@ -1,3 +1,5 @@
+@use '../mixins';
+
 // Bloque de mensajes de carga siempre en columna
 .loading-block {
   display: block;
@@ -23,10 +25,10 @@
 
 /* Mensaje de bienvenida para usuarios no logueados */
 .recipe-list-container .welcome-message {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
+  background: var(--gradient-primary) !important;
   color: white !important;
   padding: 1.5rem !important;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 2rem;
   text-align: center;
   box-shadow: var(--shadow-medium);
@@ -39,10 +41,13 @@
   color: white !important;
 }
 
-.recipe-list-container .welcome-message p:first-child {
+.recipe-list-container .welcome-message p:not(:last-child) {
+  margin-bottom: 0.6rem !important;
+}
+
+.recipe-list-container .welcome-message .welcome-message-title {
   font-size: 1.2rem !important;
   font-weight: 600;
-  margin-bottom: 0.5rem !important;
   color: white !important;
 }
 
@@ -51,6 +56,21 @@
   text-decoration: underline;
   color: white !important;
 }
+
+.recipe-list-container .welcome-message .welcome-message-toggle {
+  @include mixins.button-reset;
+  margin-top: 0.8rem;
+  color: white;
+  font-weight: 600;
+  text-decoration: underline;
+  opacity: 0.9;
+  transition: opacity var(--transition-fast);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 
 .auth-section, .auth-container {
   background-color: var(--card-background);
@@ -216,83 +236,94 @@
 
 .filters-and-sort {
   display: flex;
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan en líneas nuevas */
-  gap: 15px; /* Espacio entre los grupos de filtros */
+  flex-direction: column;
+  gap: var(--space-3);
   margin-bottom: 25px;
+  background-color: var(--background-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  border: 1px solid var(--border-color);
 }
 
-/* Estilos para las filas individuales de filtros/ordenación/paginación */
-.filters-row-one,
-.sort-row-two,
-.pagination-row-three {
+.search-bar-group--main {
+  width: 100%;
+
+  label {
+    width: auto;
+  }
+}
+
+.search-input-wrapper {
+  position: relative;
   display: flex;
-  flex-direction: column; /* Por defecto, apila los elementos en móvil */
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan si hay espacio */
-  gap: 15px; /* Espacio entre los elementos DENTRO de cada fila */
-  align-items: flex-start; /* Alinea los inputs y selects al inicio de su fila */
-  width: 100%; /* Ocupa el 100% del ancho de su contenedor */
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 1rem;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  input {
+    padding-left: 40px !important;
+    font-size: 1.05rem;
+  }
 }
 
-/* Ajustes específicos para PC - Media Query */
-@media (min-width: 768px) {
-  .filters-row-one,
-  .sort-row-two,
-  .pagination-row-three {
-    flex-direction: row; /* ¡Aquí la clave! Muestra los elementos en una fila en PC */
-    align-items: flex-end; /* Alinea los inputs y selects en la base en PC */
-  }
-
-  .filters-row-one {
-    justify-content: space-between; /* Distribuye los filtros equitativamente */
-  }
-
-  .sort-row-two {
-    justify-content: flex-start; /* O al inicio si solo hay uno */
-  }
-
-  .pagination-row-three {
-    justify-content: center; /* Centra los controles de paginación */
-  }
+/* Fila de filtros compactos, tipo toolbar */
+.filters-row-one {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
 }
 
 .search-bar-group,
 .category-input-group,
 .author-filter-group,
-.favorites-filter-group,
+.duration-filter-group,
+.servings-filter-group,
 .sort-by-group {
   display: flex;
   flex-direction: column;
-  flex: 1; /* Permite que los grupos crezcan y se encojan */
-  min-width: 200px; /* Ancho mínimo para evitar que se compriman demasiado */
-  width: 100%; /* Asegura que cada grupo ocupe el 100% del ancho disponible */
-  @media (min-width: 768px){
-    width: auto; /* En pantallas más grandes, los grupos pueden ocupar su ancho natural */
-  }
+  flex: 1;
+  min-width: 160px;
 }
 
 .recipes-per-page-group {
   display: flex;
   flex-direction: column;
-  flex: none; /* No crece ni se encoge */
-  min-width: auto; /* Ancho mínimo automático */
-  width: auto; /* Ancho automático basado en contenido */
+  flex: none;
+  min-width: auto;
+  width: auto;
 }
 
 .search-bar-group input,
 .category-input-group input,
 .author-filter-group input,
+.duration-filter-group select,
+.servings-filter-group select,
 .sort-by-group select {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-sizing: border-box;
   color: var(--text-color-dark);
   background-color: var(--card-background);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   &::placeholder {
     color: var(--placeholder-color);
   }
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
+  }
 }
+
 
 /* Estilos para el dropdown de categorías */
 .category-dropdown-container {
@@ -368,16 +399,12 @@
 }
 
 .filters-and-sort label {
-  width: 250px;
+  width: auto;
   margin-bottom: 5px;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.85rem;
   color: var(--text-color-dark);
 }
-
-.recipes-per-page-group label {
-  width: auto; /* Anula el ancho fijo para este grupo */
-}
- 
 
 .category-chips-container {
   display: flex;
@@ -412,6 +439,60 @@
   opacity: 1;
 }
 
+/* Barra de filtros activos + contador de resultados */
+.active-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--border-color);
+}
+
+.active-filters-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.clear-all-filters-button {
+  @include mixins.button-reset;
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  padding: 4px 8px;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--accent-dark);
+  }
+}
+
+.results-count {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  color: var(--text-muted);
+  background-color: var(--background-color);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+
+  p {
+    margin-bottom: var(--space-2);
+    font-size: 1.05rem;
+  }
+}
+
 .recipes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Columnas responsivas */
@@ -420,15 +501,10 @@
 }
 
 /* Estilos para el filtro de favoritos */
-.sort-row-two {
-  justify-content: center !important;
-  margin-bottom: 1rem;
-}
-
 .favorites-filter-group {
-  flex: none !important; /* No crece ni se encoge */
-  min-width: auto !important;
-  align-self: center;
+  flex: none;
+  min-width: auto;
+  align-self: flex-end;
 }
 
 .favorites-filter-group label {
