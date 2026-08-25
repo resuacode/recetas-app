@@ -337,20 +337,25 @@ const RecipeDetail = ({ isLoggedIn }) => {
     )}
 
         <div className="recipe-meta-section">
-        <p className="recipe-meta">Categorías: {recipe.categories?.join(', ') || 'N/A'}</p>
-        <p className="recipe-meta">Autor: {recipe.author?.username || 'Desconocido'}</p>
-        
-        {/* Nuevos campos con renderizado condicional */}
-        {isPresent(recipe.prepTime) && (
-          <p className="recipe-meta">Tiempo de preparación: {recipe.prepTime} mins</p>
+        {recipe.categories && recipe.categories.length > 0 && (
+          <div className="recipe-meta-categories">
+            {recipe.categories.map((cat, index) => (
+              <span key={index} className="category-chip">{cat}</span>
+            ))}
+          </div>
         )}
-        {isPresent(recipe.cookTime) && (
-          <p className="recipe-meta">Tiempo de cocción: {recipe.cookTime} mins</p>
-        )}
-        {isPresent(recipe.servings) && (
-          <p className="recipe-meta">Porciones: {recipe.servings}</p>
-        )}
-        
+        <div className="recipe-meta-badges">
+          {isPresent(recipe.prepTime) && (
+            <span className="meta-badge">⏱️ Preparación: {recipe.prepTime} min</span>
+          )}
+          {isPresent(recipe.cookTime) && (
+            <span className="meta-badge">🔥 Cocción: {recipe.cookTime} min</span>
+          )}
+          {isPresent(recipe.servings) && (
+            <span className="meta-badge">🍽️ {recipe.servings} raciones</span>
+          )}
+        </div>
+        <p className="recipe-author-meta">Autor: {recipe.author?.username || 'Desconocido'}</p>
       </div>
         <RatingInput 
           recipeId={recipe._id}

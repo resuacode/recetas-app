@@ -245,12 +245,60 @@
   border: 1px solid var(--border-color);
 }
 
+.search-bar-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+
+  @include mixins.respond(mobile) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .search-bar-group--main {
   width: 100%;
+  flex: 1;
 
   label {
     width: auto;
   }
+}
+
+.toggle-advanced-filters-button {
+  @include mixins.button-reset;
+  position: relative;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--card-background);
+  color: var(--text-color-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+
+  &:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    color: var(--text-color-light);
+  }
+}
+
+.advanced-filters-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  margin-left: 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--accent-color);
+  color: var(--text-color-light);
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .search-input-wrapper {

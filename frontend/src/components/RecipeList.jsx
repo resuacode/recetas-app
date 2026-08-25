@@ -23,6 +23,7 @@ const RecipeList = ({ isLoggedIn }) => {
   const [sortOrder, setSortOrder] = useState('createdAt:desc');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showFullWelcome, setShowFullWelcome] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Estados para el dropdown de categorías
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -248,6 +249,14 @@ const RecipeList = ({ isLoggedIn }) => {
     showFavoritesOnly
   );
 
+  // Nº de filtros avanzados activos (no cuenta la búsqueda simple, que siempre está visible)
+  const activeAdvancedFiltersCount =
+    selectedCategories.length +
+    (authorFilter ? 1 : 0) +
+    (durationFilter !== 'any' ? 1 : 0) +
+    (servingsFilter !== 'any' ? 1 : 0) +
+    (showFavoritesOnly ? 1 : 0);
+
   // Restablece todos los filtros a sus valores por defecto
   const handleClearAllFilters = () => {
     setSearchTerm('');
@@ -418,22 +427,36 @@ const RecipeList = ({ isLoggedIn }) => {
 
       {/* Contenedor principal de filtros y ordenación, ahora como toolbar moderna */}
       <div className="filters-and-sort">
-        <div className="search-bar-group search-bar-group--main">
-          <label htmlFor="search-title">Buscar recetas</label>
-          <div className="search-input-wrapper">
-            <span className="search-icon" aria-hidden="true">🔍</span>
-            <input
-              id="search-title"
-              type="text"
-              placeholder="Busca por título, descripción o ingrediente..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              aria-label="Buscar recetas por título, descripción o ingrediente"
-            />
+        <div className="search-bar-row">
+          <div className="search-bar-group search-bar-group--main">
+            <label htmlFor="search-title">Buscar recetas</label>
+            <div className="search-input-wrapper">
+              <span className="search-icon" aria-hidden="true">🔍</span>
+              <input
+                id="search-title"
+                type="text"
+                placeholder="Busca por título, descripción o ingrediente..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                aria-label="Buscar recetas por título, descripción o ingrediente"
+              />
+            </div>
           </div>
+          <button
+            type="button"
+            className="toggle-advanced-filters-button"
+            onClick={() => setShowAdvancedFilters(prev => !prev)}
+            aria-expanded={showAdvancedFilters}
+          >
+            {showAdvancedFilters ? '▲ Ocultar filtros avanzados' : '▼ Búsqueda avanzada'}
+            {!showAdvancedFilters && activeAdvancedFiltersCount > 0 && (
+              <span className="advanced-filters-badge">{activeAdvancedFiltersCount}</span>
+            )}
+          </button>
         </div>
 
-        {/* Fila de filtros compactos */}
+        {/* Fila de filtros compactos (colapsable) */}
+        {showAdvancedFilters && (
         <div className="filters-row-one">
           <div className="category-input-group">
             <label htmlFor="add-category">Categorías</label>
@@ -533,7 +556,8 @@ const RecipeList = ({ isLoggedIn }) => {
               <option value={50}>50</option>
             </select>
           </div>
-        </div> {/* Fin .filters-row-one */}
+        </div>
+        )} {/* Fin .filters-row-one */}
 
         {/* Barra de filtros activos + contador de resultados */}
         {(hasActiveFilters || totalFilteredCount > 0) && (

@@ -1,4 +1,6 @@
 /* Estilos para RecipeForm */
+@use '../mixins';
+
 .recipe-form-container {
   max-width: 800px;
   width: 100%;
@@ -51,18 +53,20 @@
 
 /* Campos dinámicos (imágenes, categorías, ingredientes, instrucciones) */
 .dynamic-fields-group {
-  border: 1px dashed var(--border-color);
-  padding: 1rem;
-  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  padding: 1.2rem 1.5rem 1.5rem;
+  border-radius: var(--radius-md);
   margin-top: 2rem;
-  background-color: #fcfcfc;
+  background-color: var(--background-color);
 }
 
 .dynamic-fields-group label {
   margin-bottom: 1rem;
   font-size: 1.1rem;
   display: block;
-  text-align: center;
+  text-align: left;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .dynamic-field-item {
@@ -70,6 +74,13 @@
   align-items: center;
   margin-bottom: 10px;
   gap: 10px;
+  padding: 0.6rem;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--card-background);
+  }
 }
 
 .dynamic-field-item input {
@@ -89,12 +100,13 @@
   cursor: pointer;
   font-weight: bold;
   font-size: 1rem;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition-base), transform var(--transition-fast);
   flex-shrink: 0; /* Evita que el botón se encoja */
 }
 
 .remove-field-button:hover {
   background-color: var(--error-dark);
+  transform: scale(1.08);
 }
 
 .add-field-button {
@@ -232,10 +244,10 @@
 /* Estilos para la previsualización de imágenes subidas */
 .uploaded-images-preview {
   margin-top: 20px;
-  border: 1px dashed var(--border-color);
+  border: 1px solid var(--border-color);
   padding: 15px;
-  border-radius: 8px;
-  background-color: #fcfcfc; // Añadir un fondo ligero si te gusta
+  border-radius: var(--radius-sm);
+  background-color: var(--card-background);
   
   p {
     font-weight: bold;
@@ -250,12 +262,12 @@
     margin-bottom: 10px;
     padding: 10px; // Añadir padding para visualización
     border: 1px solid var(--border-color); // Añadir borde para separar ítems
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background-color: var(--background-color); // Fondo para cada ítem
     
     img {
-      border-radius: 8px;
-      box-shadow: var(--shadow-small);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-light);
       width: 150px; // Tamaño fijo para previsualización
       height: 100px; // O un tamaño que te guste
       object-fit: cover; // Asegura que la imagen se vea bien sin distorsionarse
@@ -266,11 +278,11 @@
       color: white; /* Color de texto blanco */
       border: none;
       padding: 8px 15px; /* Ajusta el padding para un mejor tamaño */
-      border-radius: 8px; /* Hazlo un poco más cuadrado para que parezca un botón normal */
+      border-radius: var(--radius-sm); /* Hazlo un poco más cuadrado para que parezca un botón normal */
       cursor: pointer;
       font-weight: bold; /* Para que se vea más como un botón */
       font-size: 0.9rem; /* Un poco más grande si lo deseas */
-      transition: background-color 0.2s ease;
+      transition: background-color var(--transition-base);
       margin-left: auto; /* Empuja el botón a la derecha */
       flex-shrink: 0; // Previene que el botón se encoja
       
@@ -321,17 +333,19 @@
 
 /* Agrupar campos opcionales */
 .optional-fields-group {
-    border: 1px dashed var(--border-color);
+    border: 1px solid var(--border-color);
     padding: 1.5rem;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     margin-top: 2rem;
-    background-color: #fcfcfc;
+    background-color: var(--background-color);
 }
 
 .optional-fields-group h3 {
-    text-align: center;
+    text-align: left;
     color: var(--primary-dark);
     margin-bottom: 1.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .optional-fields-grid {
@@ -360,11 +374,11 @@
     color: white;
     border: none;
     padding: 12px 20px; /* Un poco más de padding para que se vea como un botón */
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 1rem;
     font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color var(--transition-base), transform var(--transition-fast);
     box-shadow: var(--shadow-button);
     text-align: center; /* Centrar el texto si es inline-block */
     margin-top: 10px; /* Espacio superior para separarlo de la label */
@@ -384,18 +398,23 @@
 
 /* Botón de envío */
 .submit-recipe-button {
-  background-color: var(--primary-color);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 15px 30px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 1.1rem;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: transform var(--transition-fast), box-shadow var(--transition-base);
   box-shadow: var(--shadow-button);
   margin-top: 30px;
   width: 100%;
+}
+
+.submit-recipe-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
 .submit-recipe-button:hover:not(:disabled) {

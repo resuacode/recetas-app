@@ -19,6 +19,7 @@ const RecipeManagement = ({ currentUser }) => {
   const [categoriesInput, setCategoriesInput] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [sortOrder, setSortOrder] = useState('createdAt:desc');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Estados para el dropdown de categorías
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -312,7 +313,7 @@ const RecipeManagement = ({ currentUser }) => {
       {/* Sección de filtros y búsqueda */}
       {userRecipes.length > 0 && (
         <div className="filters-container">
-          <div className="filters-row">
+          <div className="search-bar-row">
             {/* Búsqueda por título */}
             <div className="search-container">
               <input
@@ -326,7 +327,23 @@ const RecipeManagement = ({ currentUser }) => {
                 className="search-input"
               />
             </div>
+            <button
+              type="button"
+              className="toggle-advanced-filters-button"
+              onClick={() => setShowAdvancedFilters(prev => !prev)}
+              aria-expanded={showAdvancedFilters}
+            >
+              {showAdvancedFilters ? '▲ Ocultar filtros avanzados' : '▼ Búsqueda avanzada'}
+              {!showAdvancedFilters && (selectedCategories.length + (sortOrder !== 'createdAt:desc' ? 1 : 0)) > 0 && (
+                <span className="advanced-filters-badge">
+                  {selectedCategories.length + (sortOrder !== 'createdAt:desc' ? 1 : 0)}
+                </span>
+              )}
+            </button>
+          </div>
 
+          {showAdvancedFilters && (
+          <div className="filters-row">
             {/* Filtro por categorías con dropdown */}
             <div className="category-filter-container" ref={dropdownRef}>
               
@@ -406,6 +423,7 @@ const RecipeManagement = ({ currentUser }) => {
               Limpiar Filtros
             </button>
           </div>
+          )}
 
           {/* Información de resultados y paginación */}
           <div className="results-info">

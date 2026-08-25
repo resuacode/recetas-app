@@ -48,7 +48,7 @@
 
 .filters-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto auto;
+  grid-template-columns: 1fr auto auto;
   gap: 1rem;
   align-items: start;
   margin-bottom: 1rem;
@@ -57,6 +57,7 @@
 
 .search-container {
   position: relative;
+  flex: 1;
 }
 
 .search-input {
@@ -373,8 +374,11 @@
 
 
 
-/* Ajustes para la RecipeCard dentro de la lista de gestión */
+/* Ajustes para la RecipeCard dentro de la lista de gestión: miniatura pequeña en horizontal */
 .management-recipe-item .recipe-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   flex-grow: 1; /* Permite que la tarjeta ocupe el espacio restante */
   margin-right: 20px; /* Espacio entre la tarjeta y los botones */
   background: none; /* Elimina el fondo extra de la tarjeta */
@@ -382,17 +386,70 @@
   box-shadow: none; /* Elimina la sombra extra de la tarjeta */
   padding: 0; /* Elimina el padding extra */
   text-align: left; /* Asegura que el texto esté alineado a la izquierda */
+  cursor: pointer;
+}
+
+.management-recipe-item .recipe-card:hover {
+  transform: none; /* El hover ya lo gestiona .management-recipe-item */
+  box-shadow: none;
+}
+
+.management-recipe-item .recipe-card-image {
+  width: 90px;
+  height: 90px;
+  aspect-ratio: 1 / 1;
+  flex: none;
+  border-radius: var(--radius-sm);
+  margin-right: 1rem;
+}
+
+.management-recipe-item .recipe-card-image-placeholder {
+  font-size: 1.6rem;
+}
+
+.management-recipe-item .recipe-card:hover .recipe-card-image img {
+  transform: none;
+}
+
+.management-recipe-item .recipe-card-content {
+  padding: 0;
+  min-width: 0; /* Permite que el texto largo se trunque correctamente */
 }
 
 .management-recipe-item .recipe-card h3 {
   font-size: 1.3rem; /* Ajusta el tamaño de la fuente */
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .management-recipe-item .recipe-card p {
   font-size: 0.9rem;
   margin-bottom: 0;
+  -webkit-line-clamp: 2;
 }
+
+.management-recipe-item .recipe-card-meta,
+.management-recipe-item .recipe-categories {
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 600px) {
+  .management-recipe-item {
+    flex-wrap: wrap;
+  }
+
+  .management-recipe-item .recipe-card-image {
+    width: 64px;
+    height: 64px;
+    margin-right: 0.75rem;
+  }
+
+  .management-buttons {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 0.8rem;
+  }
+}
+
 
 .management-buttons {
   display: flex;
