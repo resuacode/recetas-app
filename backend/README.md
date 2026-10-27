@@ -3,7 +3,7 @@
 API REST para autenticación, recetas y favoritos.
 
 ## Stack
-- Node.js
+- Node.js 22.23.4+ (fijado en `.node-version` y `Dockerfile`)
 - Express
 - MongoDB + Mongoose
 - JWT

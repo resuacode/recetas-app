@@ -35,7 +35,7 @@ Aplicacion web de recetas con arquitectura MERN, autenticacion JWT y gestion de 
 - `AGENTS.md`: estrategia de subagentes y ahorro de tokens.
 
 ## Requisitos
-- Node.js 18+
+- Node.js 22.23.4+ (Node 20 ya no tiene soporte)
 - npm
 - MongoDB (o Docker)
 
