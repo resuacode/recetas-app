@@ -55,7 +55,7 @@ Se guarda en `localStorage`:
 	- Si falla, limpia sesion y hace logout controlado.
 
 ## Recuperacion de contrasena
-1. Usuario solicita reset con email (`forgot-password`).
+1. Usuario solicita reset con email (`forgot-password`). La respuesta es siempre la misma (200) exista o no el email, para no revelar cuentas registradas.
 2. Backend genera token aleatorio y guarda hash SHA-256 + expiracion.
 3. Se envia URL al frontend con token sin hash.
 4. Frontend envia nueva password con token.

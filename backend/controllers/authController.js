@@ -12,8 +12,14 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   // 1. Obtener usuario por email
   const user = await User.findOne({ email: String(req.body.email) }); // String() evita inyección NoSQL
 
+  // Misma respuesta exista o no el email, para no revelar qué emails están registrados
+  const genericResponse = {
+    status: 'success',
+    message: 'Si existe una cuenta con ese email, recibirás un enlace para restablecer tu contraseña.'
+  };
+
   if (!user) {
-    return res.status(404).json({ message: 'No hay usuario con ese email.' });
+    return res.status(200).json(genericResponse);
   }
 
   // 2. Generar un token de restablecimiento seguro
@@ -38,10 +44,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       message
     });
 
-    res.status(200).json({
-      status: 'success',
-      message: 'El email de restablecimiento de contraseña ha sido enviado.'
-    });
+    res.status(200).json(genericResponse);
   } catch (err) {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
