@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // Necesario para hashear contraseñas
 
+const MIN_PASSWORD_LENGTH = 8;
+
 const userSchema = mongoose.Schema(
   {
     username: {
@@ -20,7 +22,7 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6, // La contraseña debe tener al menos 6 caracteres
+      minlength: MIN_PASSWORD_LENGTH, // Solo se valida al crear/cambiar la contraseña (se valida antes del hash)
       select: false, // No se devuelve la contraseña por defecto en las consultas
     },
     role: {
@@ -58,5 +60,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 const User = mongoose.model('User', userSchema);
+User.MIN_PASSWORD_LENGTH = MIN_PASSWORD_LENGTH;
 
 module.exports = User;

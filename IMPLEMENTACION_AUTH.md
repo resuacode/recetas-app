@@ -14,7 +14,7 @@ Este documento describe el estado real de la autenticacion en recetas-app para f
 - `POST /api/users/register`
 - `POST /api/users/login`
 - `GET /api/auth/validate-token` (requiere Bearer token)
-- `POST /api/auth/refresh-token` (requiere Bearer token)
+- `POST /api/auth/refresh-token` (requiere Bearer token firmado; puede estar caducado). Devuelve un token de 1 h que conserva el `authTime` del login; pasados 7 días desde el login responde 401. Tokens antiguos sin `authTime` usan su `iat`.
 - `POST /api/auth/forgot-password`
 - `PATCH /api/auth/reset-password?token=<token>`
 

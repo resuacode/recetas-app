@@ -3,7 +3,8 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/User'); // Asegúrate de importar tu modelo de usuario
 const sendEmail = require('../config/email'); // Importa la función de envío de email
 const crypto = require('crypto'); // Módulo nativo de Node.js para generar tokens
-const bcrypt = require('bcryptjs'); // Para hashear la nueva contraseña
+const jwt = require('jsonwebtoken');
+const { generateToken, MAX_SESSION_SECONDS } = require('../utils/generateToken');
 
 // @desc Olvido la contraseña
 // @route POST /api/auth/forgot-password
@@ -80,6 +81,10 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     return res.status(400).json({ message: 'Las contraseñas no coinciden.' });
   }
 
+  if (String(req.body.password || '').length < User.MIN_PASSWORD_LENGTH) {
+    return res.status(400).json({ message: `La contraseña debe tener al menos ${User.MIN_PASSWORD_LENGTH} caracteres.` });
+  }
+
   // Hashear la nueva contraseña y guardarla
   user.password = req.body.password; // La contraseña se hasheará automáticamente por el pre-save hook en el modelo
   user.resetPasswordToken = undefined; // Limpiar el token
@@ -95,4 +100,48 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { forgotPassword, resetPassword };
+// @desc Renovar token JWT
+// @route POST /api/auth/refresh-token
+// @access Public (requiere un token firmado, aunque esté caducado)
+const refreshToken = asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+  if (!token) {
+    res.status(401);
+    throw new Error('No autorizado, no hay token');
+  }
+
+  let decoded;
+  try {
+    // Se acepta un token caducado para no cerrar la sesión tras inactividad;
+    // el límite real lo marca la vida máxima de la sesión.
+    decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+  } catch (error) {
+    res.status(401);
+    throw new Error('No autorizado, token fallido');
+  }
+
+  // Tokens antiguos no tienen authTime: se usa su fecha de emisión
+  const authTime = decoded.authTime || decoded.iat;
+  const now = Math.floor(Date.now() / 1000);
+
+  if (!authTime || now - authTime > MAX_SESSION_SECONDS) {
+    res.status(401);
+    throw new Error('Sesión expirada, inicia sesión de nuevo');
+  }
+
+  const user = await User.findById(decoded.id).select('-password');
+  if (!user) {
+    res.status(401);
+    throw new Error('No autorizado, usuario no encontrado');
+  }
+
+  res.status(200).json({
+    message: 'Token renovado correctamente',
+    token: generateToken(user._id, authTime),
+    user,
+  });
+});
+
+module.exports = { forgotPassword, resetPassword, refreshToken };

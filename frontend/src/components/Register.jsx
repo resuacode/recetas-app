@@ -29,8 +29,8 @@ const Register = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres.');
+    if (password.length < 8) {
+      toast.error('La contraseña debe tener al menos 8 caracteres.');
       setLoading(false);
       return;
     }

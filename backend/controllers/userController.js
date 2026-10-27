@@ -1,16 +1,8 @@
 // backend/controllers/userController.js
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Necesario para hashear contraseñas
-
-
-// Función auxiliar para generar JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '1h', // El token expira en 1 hora
-  });
-};
+const { MIN_PASSWORD_LENGTH } = User;
+const { generateToken } = require('../utils/generateToken');
 
 // @desc    Registrar un nuevo usuario
 // @route   POST /api/users/register
@@ -42,9 +34,9 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Comprobar la longitud mínima de la contraseña
-  if (password.length < 6) {
+  if (String(password).length < MIN_PASSWORD_LENGTH) {
     res.status(400);
-    throw new Error('La contraseña debe tener al menos 6 caracteres.');
+    throw new Error(`La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
   }
 
  // Comprobar si las contraseñas coinciden

@@ -58,7 +58,7 @@ para evitar el "cold start" del plan gratuito de Render (se duerme tras 15 min s
 - `POST /api/auth/forgot-password`
 - `PATCH /api/auth/reset-password?token=<token>`
 - `GET /api/auth/validate-token` (protegido)
-- `POST /api/auth/refresh-token` (protegido)
+- `POST /api/auth/refresh-token` (requiere Bearer token firmado; acepta tokens caducados mientras no pasen 7 días desde el login)
 
 ### Recetas
 - `GET /api/recipes` (público)
@@ -91,6 +91,8 @@ Todas las rutas requieren autenticación:
   - Auth sensible: 50 req / 15 min (`/api/users/register`, `/api/users/login`, `/api/auth/forgot-password`, `/api/auth/reset-password`)
   - `trust proxy` activado para que el límite use la IP real del cliente tras el proxy de Render.
 - Entradas de búsqueda y login convertidas a `String` (evita inyección NoSQL) y `keyword` escapado antes de usarse en `$regex`.
+- JWT de 1 h con `authTime` (momento del login). La sesión dura como máximo 7 días; después hay que volver a iniciar sesión.
+- Contraseña mínima de 8 caracteres (solo se aplica al registrar o cambiar contraseña).
 - JWT con middleware `protect` y control de roles con `authorize`. `protect` rechaza tokens de usuarios que ya no existen.
 - `compression` habilitado.
 

@@ -1,6 +1,6 @@
 // routes/authRoutes.js
 const express = require('express');
-const { forgotPassword, resetPassword } = require('../controllers/authController'); // Importa las funciones
+const { forgotPassword, resetPassword, refreshToken } = require('../controllers/authController'); // Importa las funciones
 const { protect } = require('../middleware/authMiddleware'); // Para proteger la ruta de validación
 const router = express.Router();
 
@@ -22,23 +22,8 @@ router.get('/validate-token', protect, (req, res) => {
   });
 });
 
-// Ruta para refrescar token (opcional)
+// Ruta para refrescar token (acepta tokens caducados dentro de la vida máxima de la sesión)
 // POST /api/auth/refresh-token
-router.post('/refresh-token', protect, (req, res) => {
-  // Generar un nuevo token con la información del usuario actual
-  const jwt = require('jsonwebtoken');
-  
-  const newToken = jwt.sign(
-    { id: req.user._id, role: req.user.role }, 
-    process.env.JWT_SECRET, 
-    { expiresIn: '7d' } // Nuevo token válido por 7 días
-  );
-  
-  res.status(200).json({
-    message: 'Token renovado correctamente',
-    token: newToken,
-    user: req.user
-  });
-});
+router.post('/refresh-token', refreshToken);
 
 module.exports = router;
