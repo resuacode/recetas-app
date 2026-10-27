@@ -88,8 +88,10 @@ Todas las rutas requieren autenticación:
 - CORS con lista de orígenes permitidos (`localhost`, `127.0.0.1`, `FRONTEND_URL`).
 - Rate limiting:
   - General API: 300 req / 15 min
-  - Auth sensible: 50 req / 15 min
-- JWT con middleware `protect` y control de roles con `authorize`.
+  - Auth sensible: 50 req / 15 min (`/api/users/register`, `/api/users/login`, `/api/auth/forgot-password`, `/api/auth/reset-password`)
+  - `trust proxy` activado para que el límite use la IP real del cliente tras el proxy de Render.
+- Entradas de búsqueda y login convertidas a `String` (evita inyección NoSQL) y `keyword` escapado antes de usarse en `$regex`.
+- JWT con middleware `protect` y control de roles con `authorize`. `protect` rechaza tokens de usuarios que ya no existen.
 - `compression` habilitado.
 
 ## Ejecución con Docker Compose

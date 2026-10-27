@@ -21,6 +21,9 @@ connectDB();
 
 const app = express();
 
+// Render sirve la app tras un proxy: necesario para que el rate limit use la IP real del cliente
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
 
@@ -64,8 +67,8 @@ app.use('/api/', apiLimiter); // Aplica a todas las rutas que empiezan con /api/
 // Aplica el limitador de autenticación a rutas específicas de usuario
 app.use('/api/users/register', authLimiter); // Registro
 app.use('/api/users/login', authLimiter);    // Login
-app.use('/api/users/forgot-password', authLimiter); // Olvidé contraseña
-app.use('/api/users/reset-password', authLimiter); // Restablecer contraseña
+app.use('/api/auth/forgot-password', authLimiter); // Olvidé contraseña
+app.use('/api/auth/reset-password', authLimiter); // Restablecer contraseña
 
 // Usar rutas
 app.use('/api/users', userRoutes);

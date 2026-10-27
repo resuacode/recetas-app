@@ -17,6 +17,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
       // Adjuntar el usuario a la petición (excluyendo la contraseña)
       req.user = await User.findById(decoded.id).select('-password');
+      if (!req.user) throw new Error('Usuario no encontrado');
       next();
     } catch (error) {
       console.error(error);

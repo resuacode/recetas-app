@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs'); // Para hashear la nueva contraseña
 // @access Public
 const forgotPassword = asyncHandler(async (req, res, next) => {
   // 1. Obtener usuario por email
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: String(req.body.email) }); // String() evita inyección NoSQL
 
   if (!user) {
     return res.status(404).json({ message: 'No hay usuario con ese email.' });
@@ -50,7 +50,6 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     console.error('Error al enviar email de restablecimiento:', err); // Log para depuración
     return res.status(500).json({
       message: 'Hubo un error al enviar el email de restablecimiento. Inténtalo de nuevo más tarde.',
-      error: err.message // Puedes quitar esto en producción
     });
   }
 });
@@ -61,7 +60,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 // @access Public
 const resetPassword = asyncHandler(async (req, res, next) => {
   // 1. Obtener el token de la URL y hashearlo para comparar con la BD
-  const hashedToken = crypto.createHash('sha256').update(req.query.token).digest('hex');
+  const hashedToken = crypto.createHash('sha256').update(String(req.query.token)).digest('hex');
 
   // 2. Buscar usuario con ese token no expirado
   const user = await User.findOne({

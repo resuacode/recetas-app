@@ -25,7 +25,8 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Comprobar si el usuario ya existe
-  const userExists = await User.findOne({ username });
+  // String() evita inyección de operadores NoSQL (ej: { "$ne": null })
+  const userExists = await User.findOne({ username: String(username) });
 
   if (userExists) {
     res.status(400);
@@ -33,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Comprobar si el email ya exite
-  const emailExists = await User.findOne({ email })
+  const emailExists = await User.findOne({ email: String(email) });
 
   if(emailExists) {
     res.status(400);
@@ -81,9 +82,9 @@ const authUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   // Buscar usuario
-  const user = await User.findOne({ username }).select('+password'); // Asegurarse de que la contraseña se incluya en la consulta
+  const user = await User.findOne({ username: String(username) }).select('+password'); // Asegurarse de que la contraseña se incluya en la consulta
   // Verificar contraseña
-  if (user && (await user.matchPassword(password))) {
+  if (user && (await user.matchPassword(String(password)))) {
     res.json({
       _id: user._id,
       username: user.username,

@@ -11,7 +11,8 @@ const getRecipes = asyncHandler(async (req, res) => {
   const keyword = req.query.keyword
     ? {
         title: {
-          $regex: req.query.keyword,
+          // Escapar caracteres especiales para evitar inyección de regex (ReDoS)
+          $regex: String(req.query.keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
           $options: 'i', // 'i' para case-insensitive
         },
       }
@@ -19,7 +20,7 @@ const getRecipes = asyncHandler(async (req, res) => {
 
   const category = req.query.category
     ? {
-        categories: req.query.category, // Busca recetas que contengan la categoría
+        categories: String(req.query.category), // Busca recetas que contengan la categoría
       }
     : {};
 
