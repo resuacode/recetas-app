@@ -47,8 +47,9 @@ Base URL local: `http://localhost:5000`
 ### Salud
 - `GET /` -> mensaje de estado API
 
-Nota: este endpoint recibe un ping cada 10 minutos desde `.github/workflows/keep-alive.yml`
+Nota: este endpoint recibe un ping cada 10 minutos desde un cronjob externo en cron-job.org
 para evitar el "cold start" del plan gratuito de Render (se duerme tras 15 min sin tráfico).
+No se usa GitHub Actions porque sus ejecuciones programadas se retrasan horas y no mantienen el servicio despierto.
 
 ### Usuarios
 - `POST /api/users/register`
